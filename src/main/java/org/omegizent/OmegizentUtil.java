@@ -18,21 +18,21 @@ limitations under the License.
 
 package org.omegizent;
 
-class OmegizentUtil
+public class OmegizentUtil
 {
-    OmegizentUtil() {}
+    public OmegizentUtil() {}
 
     long nanoTime()
     {
         return System.nanoTime();
     }
 
-    void interruptThread()
+    public void interruptThread()
     {
         Thread.currentThread().interrupt();
     }
 
-    void sleepThread( long millis ) throws InterruptedException
+    public void sleepThread( long millis ) throws InterruptedException
     {
         Thread.sleep( millis );
     }

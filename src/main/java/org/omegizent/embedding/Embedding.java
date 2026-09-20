@@ -1,6 +1,6 @@
 /*
 
-Copyright 2026 Jeffrey J. Weston <jjweston@gmail.com>
+Copyright 2025 Jeffrey J. Weston <jjweston@gmail.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@ limitations under the License.
 
 */
 
-package org.omegizent;
+package org.omegizent.embedding;
 
-public class OmegizentLogger
+public record Embedding( long id, ImmutableDoubleArray vector )
 {
-    public OmegizentLogger() {}
-
-    public void println( String message )
+    public Embedding
     {
-        System.out.println( message );
+        if ( vector == null ) throw new IllegalArgumentException( "Vector must not be null." );
     }
 }

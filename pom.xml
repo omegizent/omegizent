@@ -30,7 +30,7 @@ limitations under the License.
     <properties>
         <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <exec.mainClass>org.omegizent.Query</exec.mainClass>
+        <exec.mainClass>org.omegizent.cli.Query</exec.mainClass>
         <exec.filename/>
     </properties>
 
@@ -38,25 +38,25 @@ limitations under the License.
         <profile>
             <id>embed</id>
             <properties>
-                <exec.mainClass>org.omegizent.Embed</exec.mainClass>
+                <exec.mainClass>org.omegizent.cli.Embed</exec.mainClass>
             </properties>
         </profile>
         <profile>
             <id>split-text</id>
             <properties>
-                <exec.mainClass>org.omegizent.SplitTextFile</exec.mainClass>
+                <exec.mainClass>org.omegizent.cli.SplitTextFile</exec.mainClass>
             </properties>
         </profile>
         <profile>
             <id>split-markdown</id>
             <properties>
-                <exec.mainClass>org.omegizent.SplitMarkdownFile</exec.mainClass>
+                <exec.mainClass>org.omegizent.cli.SplitMarkdownFile</exec.mainClass>
             </properties>
         </profile>
         <profile>
             <id>qdrant</id>
             <properties>
-                <exec.mainClass>org.omegizent.Qdrant</exec.mainClass>
+                <exec.mainClass>org.omegizent.cli.Qdrant</exec.mainClass>
             </properties>
         </profile>
     </profiles>
@@ -247,7 +247,7 @@ limitations under the License.
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>org.omegizent.QueryGui</mainClass>
+                    <mainClass>org.omegizent.gui.QueryGui</mainClass>
                     <options>
                         <option>--enable-native-access=javafx.graphics</option>
                         <option>--enable-native-access=ALL-UNNAMED</option>

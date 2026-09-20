@@ -18,6 +18,8 @@ limitations under the License.
 
 package org.omegizent;
 
+import org.omegizent.qdrant.QdrantClientFactory;
+
 import io.qdrant.client.QdrantClient;
 
 import java.io.IOException;
@@ -27,11 +29,11 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class OmegizentTestUtil
+public class OmegizentTestUtil
 {
     private OmegizentTestUtil() {}
 
-    static String readInputStream( InputStream inputStream )
+    public static String readInputStream( InputStream inputStream )
     {
         if ( inputStream == null ) throw new IllegalArgumentException( "Input stream must not be null." );
 
@@ -39,7 +41,7 @@ class OmegizentTestUtil
         catch ( IOException e ) { throw new RuntimeException( "Failed to read from input stream.", e ); }
     }
 
-    static Path copyResource(String resourceName, Path destination ) throws IOException
+    public static Path copyResource( String resourceName, Path destination ) throws IOException
     {
         Path resourcePath = destination.resolve( resourceName );
 
@@ -52,7 +54,7 @@ class OmegizentTestUtil
         return resourcePath;
     }
 
-    static void deleteCollection(
+    public static void deleteCollection(
             QdrantClientFactory qdrantClientFactory, String collectionName, TaskRunner taskRunner )
     {
         try( QdrantClient qdrantClient = qdrantClientFactory.create() )

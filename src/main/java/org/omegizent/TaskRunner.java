@@ -18,10 +18,10 @@ limitations under the License.
 
 package org.omegizent;
 
-class TaskRunner
+public class TaskRunner
 {
-    @FunctionalInterface interface ThrowingRunnable { void run() throws Exception; }
-    @FunctionalInterface interface ThrowingSupplier< T > { T get() throws Exception; }
+    @FunctionalInterface public interface ThrowingRunnable { void run() throws Exception; }
+    @FunctionalInterface public interface ThrowingSupplier< T > { T get() throws Exception; }
 
     private final long            rateLimitDelay;
     private final OmegizentUtil   omegizentUtil;
@@ -30,24 +30,24 @@ class TaskRunner
     private boolean runPreviously = false;
     private long    previousStart;
 
-    TaskRunner( long rateLimitDelay )
+    public TaskRunner( long rateLimitDelay )
     {
         this( rateLimitDelay, new OmegizentUtil(), new OmegizentLogger() );
     }
 
-    TaskRunner( long rateLimitDelay, OmegizentUtil omegizentUtil, OmegizentLogger omegizentLogger )
+    public TaskRunner( long rateLimitDelay, OmegizentUtil omegizentUtil, OmegizentLogger omegizentLogger )
     {
         this.rateLimitDelay  = rateLimitDelay;
         this.omegizentUtil   = omegizentUtil;
         this.omegizentLogger = omegizentLogger;
     }
 
-    < T > T get( String taskName, boolean logTaskSummary, ThrowingSupplier< T > task )
+    public < T > T get( String taskName, boolean logTaskSummary, ThrowingSupplier< T > task )
     {
         return this.get( taskName, null, logTaskSummary, task );
     }
 
-    < T > T get( String taskName, String startMessage, boolean logTaskSummary, ThrowingSupplier< T > task )
+    public < T > T get( String taskName, String startMessage, boolean logTaskSummary, ThrowingSupplier< T > task )
     {
         if ( taskName == null ) throw new IllegalArgumentException( "Task name must not be null." );
         if ( taskName.isEmpty() ) throw new IllegalArgumentException( "Task name must not be empty." );
@@ -108,12 +108,12 @@ class TaskRunner
         return result;
     }
 
-    void run( String taskName, boolean logTaskSummary, ThrowingRunnable task )
+    public void run( String taskName, boolean logTaskSummary, ThrowingRunnable task )
     {
         this.run( taskName, null, logTaskSummary, task );
     }
 
-    void run( String taskName, String startMessage, boolean logTaskSummary, ThrowingRunnable task )
+    public void run( String taskName, String startMessage, boolean logTaskSummary, ThrowingRunnable task )
     {
         this.get( taskName, startMessage, logTaskSummary, () -> { task.run(); return null; } );
     }
