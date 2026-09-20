@@ -41,11 +41,13 @@ public class OmegizentTestUtil
         catch ( IOException e ) { throw new RuntimeException( "Failed to read from input stream.", e ); }
     }
 
-    public static Path copyResource( String resourceName, Path destination ) throws IOException
+    public static Path copyResource(
+            Class< ? > resourceClass, String resourceSuffix, Path destination ) throws IOException
     {
-        Path resourcePath = destination.resolve( resourceName );
+        String resourceName = resourceClass.getSimpleName() + resourceSuffix;
+        Path   resourcePath = destination.resolve( resourceName );
 
-        try ( InputStream resourceStream = OmegizentTestUtil.class.getResourceAsStream( resourceName ))
+        try ( InputStream resourceStream = resourceClass.getResourceAsStream( resourceName ))
         {
             assertNotNull( resourceStream, "Missing Resource: " + resourceName );
             Files.copy( resourceStream, resourcePath );

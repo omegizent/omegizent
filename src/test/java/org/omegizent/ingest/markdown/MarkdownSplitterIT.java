@@ -60,8 +60,8 @@ class MarkdownSplitterIT
                 """ );
 
         MarkdownSplitter markdownSplitter = new MarkdownSplitter();
-        List< String > actualChunks = markdownSplitter.split(
-                OmegizentTestUtil.copyResource( this.getClass().getSimpleName() + ".md", tempDir ));
+        List< String > actualChunks =
+                markdownSplitter.split( OmegizentTestUtil.copyResource( this.getClass(), ".md", tempDir ));
         assertThat( actualChunks ).as( "Chunks" ).isEqualTo( expectedChunks );
     }
 }
