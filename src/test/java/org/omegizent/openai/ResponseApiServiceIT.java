@@ -99,7 +99,7 @@ class ResponseApiServiceIT
                     new ResponseApiService( embeddingCacheService, embeddingService, qdrantService, openAiApiCaller );
 
             MarkdownLoader markdownLoader = new MarkdownLoader( embeddingService, qdrantService );
-            markdownLoader.load( OmegizentTestUtil.copyResource( this.getClass().getSimpleName() + ".md", tempDir ));
+            markdownLoader.load( OmegizentTestUtil.copyResource( this.getClass(), ".md", tempDir ));
 
             assertEquals( response1, responseApiService.getResponse( query1 ));
             assertEquals( response2, responseApiService.getResponse( query2 ));
