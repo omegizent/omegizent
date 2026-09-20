@@ -1,6 +1,6 @@
 /*
 
-Copyright 2026 Jeffrey J. Weston <jjweston@gmail.com>
+Copyright 2025 Jeffrey J. Weston <jjweston@gmail.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@ limitations under the License.
 
 */
 
-package org.omegizent;
+package org.omegizent.ingest.markdown;
 
-public class OmegizentLogger
+class ProcessBuilderFactory
 {
-    public OmegizentLogger() {}
+    ProcessBuilderFactory() {}
 
-    public void println( String message )
+    ProcessBuilder create( String... command )
     {
-        System.out.println( message );
+        return new ProcessBuilder( command );
     }
 }

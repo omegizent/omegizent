@@ -20,11 +20,11 @@ package org.omegizent;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
-class Environment
+public class Environment
 {
     private final Dotenv dotenv;
 
-    Environment()
+    public Environment()
     {
         this( Dotenv.load() );
     }
@@ -34,7 +34,7 @@ class Environment
         this.dotenv = dotenv;
     }
 
-    String getString( String name )
+    public String getString( String name )
     {
         if ( name == null ) throw new IllegalArgumentException( "Name must not be null." );
 
@@ -47,7 +47,7 @@ class Environment
         return result;
     }
 
-    int getInt( String name )
+    public int getInt( String name )
     {
         String value = this.getString( name );
 
