@@ -54,7 +54,7 @@ Omegizent is tested with the following versions, but other versions may also wor
 - Python:
   - `3.14.7`
 - Poetry:
-  - `2.4.1`
+  - `2.5.1`
 
 Ensure that your Python dependencies are installed and updated before running Omegizent.
 Run the following in the `python-tools` directory:
