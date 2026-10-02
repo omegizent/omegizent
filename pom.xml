@@ -32,6 +32,7 @@ limitations under the License.
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <exec.mainClass>org.omegizent.cli.Query</exec.mainClass>
         <exec.filename/>
+        <jacocoArgLine/>
     </properties>
 
     <profiles>
@@ -208,7 +209,7 @@ limitations under the License.
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.6.0</version>
                 <configuration>
-                    <argLine>-javaagent:${org.mockito:mockito-core:jar} -Xshare:off</argLine>
+                    <argLine>@{jacocoArgLine} -javaagent:${org.mockito:mockito-core:jar} -Xshare:off</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -224,7 +225,15 @@ limitations under the License.
                     </execution>
                 </executions>
                 <configuration>
-                    <argLine>--enable-native-access=ALL-UNNAMED</argLine>
+                    <argLine>@{jacocoArgLine} --enable-native-access=ALL-UNNAMED</argLine>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.15</version>
+                <configuration>
+                    <propertyName>jacocoArgLine</propertyName>
                 </configuration>
             </plugin>
             <plugin>
