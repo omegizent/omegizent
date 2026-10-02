@@ -158,6 +158,16 @@ To run the *Split Markdown* proof of concept: `mvn exec:exec -P split-markdown`
 
 To run the *Qdrant* proof of concept: `mvn exec:exec -P qdrant`
 
+## Code Coverage
+
+Generate a code coverage report:
+
+```bash
+mvn clean jacoco:prepare-agent verify jacoco:report
+```
+
+Find the report in: `target/site/jacoco/`
+
 ## License
 
 ```text
