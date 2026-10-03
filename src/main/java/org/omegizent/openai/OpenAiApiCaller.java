@@ -19,7 +19,7 @@ limitations under the License.
 package org.omegizent.openai;
 
 import org.omegizent.Environment;
-import org.omegizent.OmegizentLogger;
+import org.omegizent.ConsoleLogger;
 import org.omegizent.OmegizentUtil;
 import org.omegizent.TaskRunner;
 
@@ -52,7 +52,7 @@ public class OpenAiApiCaller
     private final HttpClient         httpClient;
     private final Random             random;
     private final OmegizentUtil      omegizentUtil;
-    private final OmegizentLogger    omegizentLogger;
+    private final ConsoleLogger      consoleLogger;
     private final TaskRunner         taskRunner;
     private final ObjectMapper       objectMapper;
     private final ObjectMapper       yamlObjectMapper;
@@ -70,13 +70,13 @@ public class OpenAiApiCaller
               HttpClient.newHttpClient(),
               new Random(),
               new OmegizentUtil(),
-              new OmegizentLogger(),
+              new ConsoleLogger(),
               new TaskRunner( 200 ));
     }
 
     OpenAiApiCaller( int maxAttempts, long minimumRetryDelay, String apiKeyVarName, Environment environment,
                      HttpRequestBuilder httpRequestBuilder, HttpClient httpClient, Random random,
-                     OmegizentUtil omegizentUtil, OmegizentLogger omegizentLogger, TaskRunner taskRunner )
+                     OmegizentUtil omegizentUtil, ConsoleLogger consoleLogger, TaskRunner taskRunner )
     {
         this.maxAttempts        = maxAttempts;
         this.minimumRetryDelay  = minimumRetryDelay;
@@ -86,7 +86,7 @@ public class OpenAiApiCaller
         this.httpClient         = httpClient;
         this.random             = random;
         this.omegizentUtil      = omegizentUtil;
-        this.omegizentLogger    = omegizentLogger;
+        this.consoleLogger      = consoleLogger;
         this.taskRunner         = taskRunner;
 
         this.objectMapper     = new ObjectMapper();
@@ -118,9 +118,9 @@ public class OpenAiApiCaller
                             JsonPointer.compile( "/request" ),
                             requestNode, embeddedJsonPatterns, arraysToTrim )).trim();
 
-            this.omegizentLogger.println( this.logDividerRequest );
-            this.omegizentLogger.println( debugRequestString );
-            this.omegizentLogger.println( this.logDividerRequest );
+            this.consoleLogger.println( this.logDividerRequest );
+            this.consoleLogger.println( debugRequestString );
+            this.consoleLogger.println( this.logDividerRequest );
         }
 
         HttpRequest request = this.httpRequestBuilder.reset()
@@ -147,9 +147,9 @@ public class OpenAiApiCaller
                 String debugResponseHeadersString =
                         this.yamlObjectMapper.writer().writeValueAsString( response.headers().map() ).trim();
 
-                this.omegizentLogger.println( this.logDividerResponseHeaders );
-                this.omegizentLogger.println( debugResponseHeadersString );
-                this.omegizentLogger.println( this.logDividerResponseHeaders );
+                this.consoleLogger.println( this.logDividerResponseHeaders );
+                this.consoleLogger.println( debugResponseHeadersString );
+                this.consoleLogger.println( this.logDividerResponseHeaders );
             }
 
             try { responseNode = this.objectMapper.readTree( responseString ); }
@@ -167,11 +167,11 @@ public class OpenAiApiCaller
                                 JsonPointer.compile( "/response" ),
                                 responseNode, embeddedJsonPatterns, arraysToTrim )).trim();
 
-                this.omegizentLogger.println( this.logDividerResponse );
-                this.omegizentLogger.println( "Status Code: " + statusCode );
-                this.omegizentLogger.println( "Response:" );
-                this.omegizentLogger.println( debugResponseString );
-                this.omegizentLogger.println( this.logDividerResponse );
+                this.consoleLogger.println( this.logDividerResponse );
+                this.consoleLogger.println( "Status Code: " + statusCode );
+                this.consoleLogger.println( "Response:" );
+                this.consoleLogger.println( debugResponseString );
+                this.consoleLogger.println( this.logDividerResponse );
             }
 
             if ( statusCode != 429 ) break;
@@ -192,7 +192,7 @@ public class OpenAiApiCaller
 
             if ( logSummary )
             {
-                this.omegizentLogger.println( String.format(
+                this.consoleLogger.println( String.format(
                         "%s, Rate Limit Exceeded, Attempt: %,d, " +
                         "Raw Retry Delay: %,d ms, Retry Delay: %,d ms, Jitter: %.3f, Sleeping: %,d ms",
                         taskName, attempt, rawRetryDelay, retryDelay, jitter, sleepDelay ));
@@ -232,7 +232,7 @@ public class OpenAiApiCaller
                 }
                 catch ( JacksonException _ )
                 {
-                    this.omegizentLogger.println(
+                    this.consoleLogger.println(
                             "Failed to deserialize embedded JSON for path: " + pathString + ", JSON: " + nodeString );
                 }
             }

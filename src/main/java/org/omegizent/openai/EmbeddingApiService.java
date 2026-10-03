@@ -18,7 +18,7 @@ limitations under the License.
 
 package org.omegizent.openai;
 
-import org.omegizent.OmegizentLogger;
+import org.omegizent.ConsoleLogger;
 import org.omegizent.embedding.ImmutableDoubleArray;
 
 import tools.jackson.databind.JsonNode;
@@ -41,7 +41,7 @@ public class EmbeddingApiService
     private final boolean         logApiResponse;
     private final List< Pattern > embeddedJsonPatterns;
     private final OpenAiApiCaller openAiApiCaller;
-    private final OmegizentLogger omegizentLogger;
+    private final ConsoleLogger   consoleLogger;
 
     public EmbeddingApiService( OpenAiApiCaller openAiApiCaller )
     {
@@ -51,12 +51,12 @@ public class EmbeddingApiService
         boolean logApiResponse        = false;
 
         this( logApiSummary, logApiRequest, logApiResponseHeaders, logApiResponse,
-                openAiApiCaller, new OmegizentLogger() );
+                openAiApiCaller, new ConsoleLogger() );
     }
 
     EmbeddingApiService(
             boolean logApiSummary, boolean logApiRequest, boolean logApiResponseHeaders, boolean logApiResponse,
-            OpenAiApiCaller openAiApiCaller, OmegizentLogger omegizentLogger )
+            OpenAiApiCaller openAiApiCaller, ConsoleLogger consoleLogger )
     {
         if ( openAiApiCaller == null ) throw new IllegalArgumentException( "OpenAI API caller must not be null." );
 
@@ -70,7 +70,7 @@ public class EmbeddingApiService
         this.logApiResponse        = logApiResponse;
         this.embeddedJsonPatterns  = List.of();
         this.openAiApiCaller       = openAiApiCaller;
-        this.omegizentLogger       = omegizentLogger;
+        this.consoleLogger         = consoleLogger;
     }
 
     public ImmutableDoubleArray getEmbeddingVector( String input )
@@ -102,7 +102,7 @@ public class EmbeddingApiService
         if ( this.logApiSummary )
         {
             int totalTokens = responseNode.path( "usage" ).path( "total_tokens" ).intValue();
-            this.omegizentLogger.println( String.format( "%s, Tokens: %,d", this.taskName, totalTokens ));
+            this.consoleLogger.println( String.format( "%s, Tokens: %,d", this.taskName, totalTokens ));
         }
 
         JsonNode embeddingNode = responseNode.path( "data" ).get( 0 ).path( "embedding" );

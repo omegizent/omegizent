@@ -18,9 +18,9 @@ limitations under the License.
 
 package org.omegizent;
 
-public class OmegizentLogger
+public class ConsoleLogger
 {
-    public OmegizentLogger() {}
+    public ConsoleLogger() {}
 
     public void println( String message )
     {

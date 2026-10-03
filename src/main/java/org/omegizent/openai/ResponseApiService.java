@@ -18,7 +18,7 @@ limitations under the License.
 
 package org.omegizent.openai;
 
-import org.omegizent.OmegizentLogger;
+import org.omegizent.ConsoleLogger;
 import org.omegizent.embedding.Embedding;
 import org.omegizent.embedding.EmbeddingCacheService;
 import org.omegizent.embedding.EmbeddingService;
@@ -54,7 +54,7 @@ public class ResponseApiService
     private final EmbeddingService      embeddingService;
     private final QdrantService         qdrantService;
     private final OpenAiApiCaller       openAiApiCaller;
-    private final OmegizentLogger       omegizentLogger;
+    private final ConsoleLogger         consoleLogger;
     private final ArrayNode             tools;
     private final ArrayNode             messages;
     private final Set< Long >           searchResultIds;
@@ -73,14 +73,14 @@ public class ResponseApiService
         boolean logFunctionCalls      = true;
 
         this( iterationLimit, logApiSummary, logApiRequest, logApiResponseHeaders, logApiResponse, logFunctionCalls,
-                embeddingCacheService, embeddingService, qdrantService, openAiApiCaller, new OmegizentLogger() );
+                embeddingCacheService, embeddingService, qdrantService, openAiApiCaller, new ConsoleLogger() );
     }
 
     ResponseApiService( int iterationLimit, boolean logApiSummary, boolean logApiRequest,
                         boolean logApiResponseHeaders, boolean logApiResponse, boolean logFunctionCalls,
                         EmbeddingCacheService embeddingCacheService, EmbeddingService embeddingService,
                         QdrantService qdrantService, OpenAiApiCaller openAiApiCaller,
-                        OmegizentLogger omegizentLogger )
+                        ConsoleLogger consoleLogger )
     {
         if ( embeddingCacheService == null )
             throw new IllegalArgumentException( "Embedding cache service must not be null." );
@@ -106,7 +106,7 @@ public class ResponseApiService
         this.embeddingService      = embeddingService;
         this.qdrantService         = qdrantService;
         this.openAiApiCaller       = openAiApiCaller;
-        this.omegizentLogger       = omegizentLogger;
+        this.consoleLogger         = consoleLogger;
 
         this.tools = this.objectMapper.createArrayNode()
                 .add( this.objectMapper.createObjectNode()
@@ -212,7 +212,7 @@ public class ResponseApiService
                 int newInputTokenCount = inputTokenCount - this.previousInputTokenCount;
                 this.previousInputTokenCount = inputTokenCount;
 
-                this.omegizentLogger.println( String.format(
+                this.consoleLogger.println( String.format(
                         "%s, Iteration: %,d, New Input Tokens: %,d, Total Input Tokens: %,d, " +
                                 "Output Tokens: %,d, Total Tokens: %,d",
                         this.taskName, iterationCount,
@@ -323,7 +323,7 @@ public class ResponseApiService
 
         if ( this.logFunctionCalls )
         {
-            this.omegizentLogger.println( String.format( "%s, Search Readme: %s", this.taskName, query ));
+            this.consoleLogger.println( String.format( "%s, Search Readme: %s", this.taskName, query ));
         }
 
         Embedding queryEmbedding = this.embeddingService.getEmbedding( query );
@@ -343,7 +343,7 @@ public class ResponseApiService
 
             if ( this.logFunctionCalls )
             {
-                this.omegizentLogger.println(
+                this.consoleLogger.println(
                         String.format( functionCallLogFormat, id, score, duplicate ? ", Duplicate" : "" ));
             }
 

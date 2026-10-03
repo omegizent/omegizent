@@ -18,7 +18,7 @@ limitations under the License.
 
 package org.omegizent.embedding;
 
-import org.omegizent.OmegizentLogger;
+import org.omegizent.ConsoleLogger;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +44,7 @@ class EmbeddingCacheServiceTest
     private final Embedding testEmbedding =
             new Embedding( 42, new ImmutableDoubleArray( new double[] { -0.75, -0.5, 0.5, 0.75 } ));
 
-    @Mock private OmegizentLogger   mockOmegizentLogger;
+    @Mock private ConsoleLogger     mockConsoleLogger;
     @Mock private Connection        mockConnection;
     @Mock private PreparedStatement mockPreparedStatement;
     @Mock private ResultSet         mockResultSet;
@@ -54,7 +54,7 @@ class EmbeddingCacheServiceTest
     {
         @SuppressWarnings( "DataFlowIssue" )
         IllegalArgumentException exception = assertThrowsExactly( IllegalArgumentException.class,
-                () -> new EmbeddingCacheService( false, null, this.mockOmegizentLogger ));
+                () -> new EmbeddingCacheService( false, null, this.mockConsoleLogger ));
 
         assertEquals( "Connection must not be null.", exception.getMessage() );
     }
@@ -179,8 +179,8 @@ class EmbeddingCacheServiceTest
         when( this.mockResultSet.getLong( 1 )).thenReturn( 1_042L );
         assertEquals( 1_042, embeddingCacheService.cacheEmbedding( "Test", this.testEmbedding.vector() ));
 
-        verify( this.mockOmegizentLogger ).println( "Cache New Embedding, ID: 1,042" );
-        verifyNoMoreInteractions( this.mockOmegizentLogger );
+        verify( this.mockConsoleLogger ).println( "Cache New Embedding, ID: 1,042" );
+        verifyNoMoreInteractions( this.mockConsoleLogger );
     }
 
     @Test
@@ -214,6 +214,6 @@ class EmbeddingCacheServiceTest
     private EmbeddingCacheService getEmbeddingCacheService( boolean logSummary ) throws Exception
     {
         when( this.mockConnection.prepareStatement( any() )).thenReturn( this.mockPreparedStatement );
-        return new EmbeddingCacheService( logSummary, this.mockConnection, this.mockOmegizentLogger );
+        return new EmbeddingCacheService( logSummary, this.mockConnection, this.mockConsoleLogger );
     }
 }
