@@ -29,9 +29,9 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class OmegizentTestUtil
+public class TestSupport
 {
-    private OmegizentTestUtil() {}
+    private TestSupport() {}
 
     public static String readInputStream( InputStream inputStream )
     {

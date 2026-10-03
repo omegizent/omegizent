@@ -18,7 +18,7 @@ limitations under the License.
 
 package org.omegizent.openai;
 
-import org.omegizent.OmegizentTestUtil;
+import org.omegizent.TestSupport;
 import org.omegizent.embedding.ImmutableDoubleArray;
 
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ class EmbeddingApiServiceIT
         ImmutableDoubleArray expectedVector;
         try ( InputStream resourceStream = this.getClass().getResourceAsStream( resourceName ))
         {
-            expectedVector = new ImmutableDoubleArray( OmegizentTestUtil.readInputStream( resourceStream ));
+            expectedVector = new ImmutableDoubleArray( TestSupport.readInputStream( resourceStream ));
         }
 
         OpenAiApiCaller openAiApiCaller = new OpenAiApiCaller();

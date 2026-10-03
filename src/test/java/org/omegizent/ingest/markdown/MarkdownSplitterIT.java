@@ -18,7 +18,7 @@ limitations under the License.
 
 package org.omegizent.ingest.markdown;
 
-import org.omegizent.OmegizentTestUtil;
+import org.omegizent.TestSupport;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -61,7 +61,7 @@ class MarkdownSplitterIT
 
         MarkdownSplitter markdownSplitter = new MarkdownSplitter();
         List< String > actualChunks =
-                markdownSplitter.split( OmegizentTestUtil.copyResource( this.getClass(), ".md", tempDir ));
+                markdownSplitter.split( TestSupport.copyResource( this.getClass(), ".md", tempDir ));
         assertThat( actualChunks ).as( "Chunks" ).isEqualTo( expectedChunks );
     }
 }
