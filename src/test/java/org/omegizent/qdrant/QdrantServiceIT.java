@@ -18,7 +18,7 @@ limitations under the License.
 
 package org.omegizent.qdrant;
 
-import org.omegizent.OmegizentTestUtil;
+import org.omegizent.TestSupport;
 import org.omegizent.TaskRunner;
 import org.omegizent.embedding.Embedding;
 import org.omegizent.embedding.ImmutableDoubleArray;
@@ -42,7 +42,7 @@ class QdrantServiceIT
     @AfterEach
     void tearDown()
     {
-        OmegizentTestUtil.deleteCollection( this.qdrantClientFactory, this.collectionName, this.taskRunner );
+        TestSupport.deleteCollection( this.qdrantClientFactory, this.collectionName, this.taskRunner );
     }
 
     @Test
@@ -100,7 +100,7 @@ class QdrantServiceIT
     {
         try ( InputStream resourceStream = this.getClass().getResourceAsStream( resourceName ))
         {
-            return new ImmutableDoubleArray( OmegizentTestUtil.readInputStream( resourceStream ));
+            return new ImmutableDoubleArray( TestSupport.readInputStream( resourceStream ));
         }
     }
 }

@@ -18,7 +18,7 @@ limitations under the License.
 
 package org.omegizent.openai;
 
-import org.omegizent.OmegizentTestUtil;
+import org.omegizent.TestSupport;
 import org.omegizent.TaskRunner;
 import org.omegizent.embedding.EmbeddingCacheService;
 import org.omegizent.embedding.EmbeddingService;
@@ -45,7 +45,7 @@ class ResponseApiServiceIT
     @AfterEach
     void tearDown()
     {
-        OmegizentTestUtil.deleteCollection( this.qdrantClientFactory, this.collectionName, this.taskRunner );
+        TestSupport.deleteCollection( this.qdrantClientFactory, this.collectionName, this.taskRunner );
     }
 
     @Test
@@ -99,7 +99,7 @@ class ResponseApiServiceIT
                     new ResponseApiService( embeddingCacheService, embeddingService, qdrantService, openAiApiCaller );
 
             MarkdownLoader markdownLoader = new MarkdownLoader( embeddingService, qdrantService );
-            markdownLoader.load( OmegizentTestUtil.copyResource( this.getClass(), ".md", tempDir ));
+            markdownLoader.load( TestSupport.copyResource( this.getClass(), ".md", tempDir ));
 
             assertEquals( response1, responseApiService.getResponse( query1 ));
             assertEquals( response2, responseApiService.getResponse( query2 ));
