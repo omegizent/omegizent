@@ -19,7 +19,7 @@ limitations under the License.
 package org.omegizent.openai;
 
 import org.omegizent.Environment;
-import org.omegizent.OmegizentLogger;
+import org.omegizent.ConsoleLogger;
 import org.omegizent.OmegizentUtil;
 import org.omegizent.TaskRunner;
 
@@ -67,7 +67,7 @@ class OpenAIApiCallerTest
     @Mock private Random                 mockRandom;
     @Mock private OmegizentUtil          mockOmegizentUtil_OpenAiApiCaller;
     @Mock private OmegizentUtil          mockOmegizentUtil_TaskRunner;
-    @Mock private OmegizentLogger        mockOmegizentLogger;
+    @Mock private ConsoleLogger          mockConsoleLogger;
     @Mock private HttpResponse< String > mockHttpResponse;
     @Mock private HttpHeaders            mockHttpHeaders;
 
@@ -202,21 +202,21 @@ class OpenAIApiCallerTest
 
         assertEquals( expectedMessage, exception.getMessage() );
 
-        InOrder inOrder = inOrder( this.mockOmegizentLogger, this.mockOmegizentUtil_OpenAiApiCaller );
-        inOrder.verify( this.mockOmegizentLogger ).println( "OpenAIApiCallerTest, Starting" );
-        inOrder.verify( this.mockOmegizentLogger ).println( "OpenAIApiCallerTest, Complete, Duration: 0 ms" );
-        inOrder.verify( this.mockOmegizentLogger ).println( "OpenAIApiCallerTest, Rate Limit Exceeded, " +
+        InOrder inOrder = inOrder( this.mockConsoleLogger, this.mockOmegizentUtil_OpenAiApiCaller );
+        inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Starting" );
+        inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Complete, Duration: 0 ms" );
+        inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Rate Limit Exceeded, " +
                 "Attempt: 1, Raw Retry Delay: 20,000 ms, Retry Delay: 20,000 ms, Jitter: 1.150, Sleeping: 23,000 ms" );
         inOrder.verify( this.mockOmegizentUtil_OpenAiApiCaller ).sleepThread( 23_000 );
-        inOrder.verify( this.mockOmegizentLogger ).println( "OpenAIApiCallerTest, Starting" );
-        inOrder.verify( this.mockOmegizentLogger ).println( "OpenAIApiCallerTest, Complete, Duration: 0 ms" );
-        inOrder.verify( this.mockOmegizentLogger ).println( "OpenAIApiCallerTest, Rate Limit Exceeded, " +
+        inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Starting" );
+        inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Complete, Duration: 0 ms" );
+        inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Rate Limit Exceeded, " +
                 "Attempt: 2, Raw Retry Delay: 20,000 ms, Retry Delay: 23,000 ms, Jitter: 2.000, Sleeping: 46,000 ms" );
         inOrder.verify( this.mockOmegizentUtil_OpenAiApiCaller ).sleepThread( 46_000 );
-        inOrder.verify( this.mockOmegizentLogger ).println( "OpenAIApiCallerTest, Starting" );
-        inOrder.verify( this.mockOmegizentLogger ).println( "OpenAIApiCallerTest, Complete, Duration: 0 ms" );
+        inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Starting" );
+        inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Complete, Duration: 0 ms" );
         inOrder.verifyNoMoreInteractions();
-        verifyNoMoreInteractions( this.mockOmegizentLogger, this.mockOmegizentUtil_OpenAiApiCaller );
+        verifyNoMoreInteractions( this.mockConsoleLogger, this.mockOmegizentUtil_OpenAiApiCaller );
     }
 
     @Test
@@ -283,16 +283,16 @@ class OpenAIApiCallerTest
 
         assertEquals( expectedResponseNode, actualResponseNode );
 
-        InOrder inOrder = inOrder( this.mockOmegizentLogger, this.mockOmegizentUtil_OpenAiApiCaller );
-        inOrder.verify( this.mockOmegizentLogger ).println( "OpenAIApiCallerTest, Starting, Start Message" );
-        inOrder.verify( this.mockOmegizentLogger ).println( "OpenAIApiCallerTest, Complete, Duration: 0 ms" );
-        inOrder.verify( this.mockOmegizentLogger ).println( "OpenAIApiCallerTest, Rate Limit Exceeded, " +
+        InOrder inOrder = inOrder( this.mockConsoleLogger, this.mockOmegizentUtil_OpenAiApiCaller );
+        inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Starting, Start Message" );
+        inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Complete, Duration: 0 ms" );
+        inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Rate Limit Exceeded, " +
                 "Attempt: 1, Raw Retry Delay: 5,000 ms, Retry Delay: 10,000 ms, Jitter: 1.175, Sleeping: 11,750 ms" );
         inOrder.verify( this.mockOmegizentUtil_OpenAiApiCaller ).sleepThread( 11_750 );
-        inOrder.verify( this.mockOmegizentLogger ).println( "OpenAIApiCallerTest, Starting, Start Message" );
-        inOrder.verify( this.mockOmegizentLogger ).println( "OpenAIApiCallerTest, Complete, Duration: 0 ms" );
+        inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Starting, Start Message" );
+        inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Complete, Duration: 0 ms" );
         inOrder.verifyNoMoreInteractions();
-        verifyNoMoreInteractions( this.mockOmegizentLogger, this.mockOmegizentUtil_OpenAiApiCaller );
+        verifyNoMoreInteractions( this.mockConsoleLogger, this.mockOmegizentUtil_OpenAiApiCaller );
     }
 
     @Test
@@ -395,11 +395,11 @@ class OpenAIApiCallerTest
         assertEquals( expectedRequestNode, actualRequestNode );
         assertEquals( expectedResponseNode, actualResponseNode );
 
-        InOrder inOrder = inOrder( this.mockOmegizentLogger );
-        inOrder.verify( this.mockOmegizentLogger ).println( "OpenAIApiCallerTest, Starting, Start Message" );
-        inOrder.verify( this.mockOmegizentLogger ).println( "OpenAIApiCallerTest, Complete, Duration: 0 ms" );
+        InOrder inOrder = inOrder( this.mockConsoleLogger );
+        inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Starting, Start Message" );
+        inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Complete, Duration: 0 ms" );
         inOrder.verifyNoMoreInteractions();
-        verifyNoMoreInteractions( this.mockOmegizentLogger );
+        verifyNoMoreInteractions( this.mockConsoleLogger );
     }
 
     private OpenAiApiCaller createOpenAiApiCaller()
@@ -407,12 +407,12 @@ class OpenAIApiCallerTest
         int  testMaxAttempts       = 3;
         long testMinimumRetryDelay = 10_000;
 
-        TaskRunner testTaskRunner = new TaskRunner( 0, this.mockOmegizentUtil_TaskRunner, this.mockOmegizentLogger );
+        TaskRunner testTaskRunner = new TaskRunner( 0, this.mockOmegizentUtil_TaskRunner, this.mockConsoleLogger );
 
         return new OpenAiApiCaller(
                 testMaxAttempts, testMinimumRetryDelay, this.testApiKeyVarName, this.mockEnvironment,
                 this.mockHttpRequestBuilder, this.mockHttpClient, this.mockRandom,
-                this.mockOmegizentUtil_OpenAiApiCaller, this.mockOmegizentLogger, testTaskRunner );
+                this.mockOmegizentUtil_OpenAiApiCaller, this.mockConsoleLogger, testTaskRunner );
     }
 
     private void mockApiCall( String response, int... statusCodes ) throws Exception

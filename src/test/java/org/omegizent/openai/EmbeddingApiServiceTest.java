@@ -18,7 +18,7 @@ limitations under the License.
 
 package org.omegizent.openai;
 
-import org.omegizent.OmegizentLogger;
+import org.omegizent.ConsoleLogger;
 import org.omegizent.embedding.ImmutableDoubleArray;
 
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith( MockitoExtension.class )
 class EmbeddingApiServiceTest
 {
-    @Mock private OmegizentLogger mockOmegizentLogger;
+    @Mock private ConsoleLogger   mockConsoleLogger;
     @Mock private OpenAiApiCaller mockOpenAiApiCaller;
 
     @Captor private ArgumentCaptor< String >     startMessageCaptor;
@@ -53,7 +53,7 @@ class EmbeddingApiServiceTest
     {
         @SuppressWarnings( "DataFlowIssue" )
         IllegalArgumentException exception = assertThrowsExactly( IllegalArgumentException.class,
-                () -> new EmbeddingApiService( false, false, false, false, null, this.mockOmegizentLogger ));
+                () -> new EmbeddingApiService( false, false, false, false, null, this.mockConsoleLogger ));
 
         assertEquals( "OpenAI API caller must not be null.", exception.getMessage() );
     }
@@ -62,7 +62,7 @@ class EmbeddingApiServiceTest
     void testGetEmbeddingVector_nullInput()
     {
         EmbeddingApiService embeddingApiService = new EmbeddingApiService(
-                false, false, false, false, this.mockOpenAiApiCaller, this.mockOmegizentLogger );
+                false, false, false, false, this.mockOpenAiApiCaller, this.mockConsoleLogger );
 
         IllegalArgumentException exception = assertThrowsExactly(
                 IllegalArgumentException.class, () -> embeddingApiService.getEmbeddingVector( null ));
@@ -74,7 +74,7 @@ class EmbeddingApiServiceTest
     void testGetEmbeddingVector_emptyInput()
     {
         EmbeddingApiService embeddingApiService = new EmbeddingApiService(
-                false, false, false, false, this.mockOpenAiApiCaller, this.mockOmegizentLogger );
+                false, false, false, false, this.mockOpenAiApiCaller, this.mockConsoleLogger );
 
         IllegalArgumentException exception = assertThrowsExactly(
                 IllegalArgumentException.class, () -> embeddingApiService.getEmbeddingVector( "" ));
@@ -86,7 +86,7 @@ class EmbeddingApiServiceTest
     void testGetEmbeddingVector_longInput()
     {
         EmbeddingApiService embeddingApiService = new EmbeddingApiService(
-                false, false, false, false, this.mockOpenAiApiCaller, this.mockOmegizentLogger );
+                false, false, false, false, this.mockOpenAiApiCaller, this.mockConsoleLogger );
 
         String input = "a".repeat( 32_768 );
 
@@ -128,7 +128,7 @@ class EmbeddingApiServiceTest
                 .thenReturn( responseNode );
 
         EmbeddingApiService embeddingApiService = new EmbeddingApiService(
-                true, false, false, false, this.mockOpenAiApiCaller, this.mockOmegizentLogger );
+                true, false, false, false, this.mockOpenAiApiCaller, this.mockConsoleLogger );
 
         ImmutableDoubleArray actualVector = embeddingApiService.getEmbeddingVector( expectedInput );
 
@@ -140,7 +140,7 @@ class EmbeddingApiServiceTest
         assertEquals( expectedVector, actualVector );
         assertEquals( "Input Length: 1,099", actualStartMessage );
 
-        verify( this.mockOmegizentLogger ).println( "Embedding API Call, Tokens: 1,024" );
-        verifyNoMoreInteractions( this.mockOmegizentLogger );
+        verify( this.mockConsoleLogger ).println( "Embedding API Call, Tokens: 1,024" );
+        verifyNoMoreInteractions( this.mockConsoleLogger );
     }
 }

@@ -36,15 +36,15 @@ import static org.mockito.Mockito.when;
 @ExtendWith( MockitoExtension.class )
 class TaskRunnerTest
 {
-    @Mock private OmegizentUtil   mockOmegizentUtil;
-    @Mock private OmegizentLogger mockOmegizentLogger;
+    @Mock private OmegizentUtil mockOmegizentUtil;
+    @Mock private ConsoleLogger mockConsoleLogger;
 
     private TaskRunner taskRunner;
 
     @BeforeEach
     void setUp()
     {
-        this.taskRunner = new TaskRunner( 5_000, this.mockOmegizentUtil, this.mockOmegizentLogger );
+        this.taskRunner = new TaskRunner( 5_000, this.mockOmegizentUtil, this.mockConsoleLogger );
     }
 
     @Test
@@ -140,18 +140,18 @@ class TaskRunnerTest
 
         assertEquals( taskName + ", Sleep Interrupted", exception.getMessage() );
 
-        InOrder inOrder = inOrder( this.mockOmegizentUtil, this.mockOmegizentLogger );
+        InOrder inOrder = inOrder( this.mockOmegizentUtil, this.mockConsoleLogger );
 
-        inOrder.verify( this.mockOmegizentLogger ).println( taskName + ", Starting" );
-        inOrder.verify( this.mockOmegizentLogger ).println( taskName + ", Complete, Duration: 1,250 ms" );
-        inOrder.verify( this.mockOmegizentLogger ).println( taskName + ", Starting" );
-        inOrder.verify( this.mockOmegizentLogger ).println( taskName + ", Complete, Duration: 1,500 ms" );
-        inOrder.verify( this.mockOmegizentLogger ).println( taskName + ", Starting, Start Message" );
-        inOrder.verify( this.mockOmegizentLogger ).println( taskName + ", Complete, Duration: 1,750 ms" );
-        inOrder.verify( this.mockOmegizentLogger ).println( taskName + ", Sleeping, Duration: 2,500 ms" );
+        inOrder.verify( this.mockConsoleLogger ).println( taskName + ", Starting" );
+        inOrder.verify( this.mockConsoleLogger ).println( taskName + ", Complete, Duration: 1,250 ms" );
+        inOrder.verify( this.mockConsoleLogger ).println( taskName + ", Starting" );
+        inOrder.verify( this.mockConsoleLogger ).println( taskName + ", Complete, Duration: 1,500 ms" );
+        inOrder.verify( this.mockConsoleLogger ).println( taskName + ", Starting, Start Message" );
+        inOrder.verify( this.mockConsoleLogger ).println( taskName + ", Complete, Duration: 1,750 ms" );
+        inOrder.verify( this.mockConsoleLogger ).println( taskName + ", Sleeping, Duration: 2,500 ms" );
         inOrder.verify( this.mockOmegizentUtil ).interruptThread();
 
         inOrder.verifyNoMoreInteractions();
-        verifyNoMoreInteractions( this.mockOmegizentUtil, this.mockOmegizentLogger );
+        verifyNoMoreInteractions( this.mockOmegizentUtil, this.mockConsoleLogger );
     }
 }

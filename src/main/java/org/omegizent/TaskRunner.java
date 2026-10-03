@@ -23,23 +23,23 @@ public class TaskRunner
     @FunctionalInterface public interface ThrowingRunnable { void run() throws Exception; }
     @FunctionalInterface public interface ThrowingSupplier< T > { T get() throws Exception; }
 
-    private final long            rateLimitDelay;
-    private final OmegizentUtil   omegizentUtil;
-    private final OmegizentLogger omegizentLogger;
+    private final long          rateLimitDelay;
+    private final OmegizentUtil omegizentUtil;
+    private final ConsoleLogger consoleLogger;
 
     private boolean runPreviously = false;
     private long    previousStart;
 
     public TaskRunner( long rateLimitDelay )
     {
-        this( rateLimitDelay, new OmegizentUtil(), new OmegizentLogger() );
+        this( rateLimitDelay, new OmegizentUtil(), new ConsoleLogger() );
     }
 
-    public TaskRunner( long rateLimitDelay, OmegizentUtil omegizentUtil, OmegizentLogger omegizentLogger )
+    public TaskRunner( long rateLimitDelay, OmegizentUtil omegizentUtil, ConsoleLogger consoleLogger )
     {
-        this.rateLimitDelay  = rateLimitDelay;
-        this.omegizentUtil   = omegizentUtil;
-        this.omegizentLogger = omegizentLogger;
+        this.rateLimitDelay = rateLimitDelay;
+        this.omegizentUtil  = omegizentUtil;
+        this.consoleLogger  = consoleLogger;
     }
 
     public < T > T get( String taskName, boolean logTaskSummary, ThrowingSupplier< T > task )
@@ -62,10 +62,7 @@ public class TaskRunner
             if ( delayMs > 0 )
             {
                 if ( logTaskSummary )
-                {
-                    this.omegizentLogger.println(
-                            String.format( "%s, Sleeping, Duration: %,d ms", taskName, delayMs ));
-                }
+                    this.consoleLogger.println( String.format( "%s, Sleeping, Duration: %,d ms", taskName, delayMs ));
 
                 try { this.omegizentUtil.sleepThread( delayMs ); }
                 catch ( InterruptedException e )
@@ -81,7 +78,7 @@ public class TaskRunner
         {
             String message = taskName + ", Starting";
             if (( startMessage != null ) && ( !startMessage.isEmpty() )) message += ", " + startMessage;
-            this.omegizentLogger.println( message );
+            this.consoleLogger.println( message );
         }
 
         long startTime = this.omegizentUtil.nanoTime();
@@ -102,7 +99,7 @@ public class TaskRunner
 
         if ( logTaskSummary )
         {
-            this.omegizentLogger.println( String.format( "%s, Complete, Duration: %,d ms", taskName, deltaMs ));
+            this.consoleLogger.println( String.format( "%s, Complete, Duration: %,d ms", taskName, deltaMs ));
         }
 
         return result;

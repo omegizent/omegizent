@@ -18,7 +18,7 @@ limitations under the License.
 
 package org.omegizent.qdrant;
 
-import org.omegizent.OmegizentLogger;
+import org.omegizent.ConsoleLogger;
 import org.omegizent.OmegizentUtil;
 import org.omegizent.TaskRunner;
 import org.omegizent.embedding.Embedding;
@@ -59,7 +59,7 @@ class QdrantServiceTest
     private final int    testCollectionSize = 5;
 
     @Mock private OmegizentUtil                                               mockOmegizentUtil;
-    @Mock private OmegizentLogger                                             mockOmegizentLogger;
+    @Mock private ConsoleLogger                                               mockConsoleLogger;
     @Mock private QdrantClientFactory                                         mockQdrantClientFactory;
     @Mock private QdrantClient                                                mockQdrantClient;
     @Mock private ListenableFuture< Boolean >                                 mockBooleanListenableFuture;
@@ -150,17 +150,17 @@ class QdrantServiceTest
 
         try ( QdrantService qdrantService = this.createQdrantService( this.testCollectionSize, true ))
         {
-            clearInvocations( this.mockOmegizentLogger );
+            clearInvocations( this.mockConsoleLogger );
             qdrantService.upsert( testEmbedding );
         }
 
-        InOrder inOrder = inOrder( this.mockOmegizentLogger );
+        InOrder inOrder = inOrder( this.mockConsoleLogger );
 
-        inOrder.verify( this.mockOmegizentLogger ).println( "Qdrant - Upsert Point, Starting, Point ID: 1,024" );
-        inOrder.verify( this.mockOmegizentLogger ).println( "Qdrant - Upsert Point, Complete, Duration: 0 ms" );
+        inOrder.verify( this.mockConsoleLogger ).println( "Qdrant - Upsert Point, Starting, Point ID: 1,024" );
+        inOrder.verify( this.mockConsoleLogger ).println( "Qdrant - Upsert Point, Complete, Duration: 0 ms" );
 
         inOrder.verifyNoMoreInteractions();
-        verifyNoMoreInteractions( this.mockOmegizentLogger );
+        verifyNoMoreInteractions( this.mockConsoleLogger );
     }
 
     @Test
@@ -260,7 +260,7 @@ class QdrantServiceTest
 
     private QdrantService createQdrantService( int collectionSize, boolean logSummary )
     {
-        TaskRunner taskRunner = new TaskRunner( 0, this.mockOmegizentUtil, this.mockOmegizentLogger );
+        TaskRunner taskRunner = new TaskRunner( 0, this.mockOmegizentUtil, this.mockConsoleLogger );
         return new QdrantService(
                 this.testCollectionName, collectionSize, logSummary, taskRunner, this.mockQdrantClientFactory );
     }

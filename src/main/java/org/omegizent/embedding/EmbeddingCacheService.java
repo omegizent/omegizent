@@ -18,7 +18,7 @@ limitations under the License.
 
 package org.omegizent.embedding;
 
-import org.omegizent.OmegizentLogger;
+import org.omegizent.ConsoleLogger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,24 +28,24 @@ import java.sql.Statement;
 
 public class EmbeddingCacheService
 {
-    private final boolean         logSummary;
-    private final Connection      connection;
-    private final OmegizentLogger omegizentLogger;
+    private final boolean       logSummary;
+    private final Connection    connection;
+    private final ConsoleLogger consoleLogger;
 
     public EmbeddingCacheService( Connection connection )
     {
         boolean logSummary = false;
 
-        this( logSummary, connection, new OmegizentLogger() );
+        this( logSummary, connection, new ConsoleLogger() );
     }
 
-    EmbeddingCacheService( boolean logSummary, Connection connection, OmegizentLogger omegizentLogger )
+    EmbeddingCacheService( boolean logSummary, Connection connection, ConsoleLogger consoleLogger )
     {
         if ( connection == null ) throw new IllegalArgumentException( "Connection must not be null." );
 
-        this.logSummary      = logSummary;
-        this.connection      = connection;
-        this.omegizentLogger = omegizentLogger;
+        this.logSummary    = logSummary;
+        this.connection    = connection;
+        this.consoleLogger = consoleLogger;
 
         this.init();
     }
@@ -102,7 +102,7 @@ public class EmbeddingCacheService
 
                 if ( this.logSummary )
                 {
-                    this.omegizentLogger.println( String.format( "Cache New Embedding, ID: %,d", id ));
+                    this.consoleLogger.println( String.format( "Cache New Embedding, ID: %,d", id ));
                 }
 
                 return id;
