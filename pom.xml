@@ -189,7 +189,7 @@ limitations under the License.
                 <artifactId>versions-maven-plugin</artifactId>
                 <version>2.22.0</version>
                 <configuration>
-                    <ignoredVersions>(?i).*-(alpha|beta|m|rc)([-.]?\d+)?</ignoredVersions>
+                    <ignoredVersions>(?i).*-(alpha|beta|ea|m|rc)([-.+]?\d+)?</ignoredVersions>
                 </configuration>
             </plugin>
             <plugin>
