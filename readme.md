@@ -82,7 +82,7 @@ Ensure that [Docker Engine](https://docs.docker.com/engine/install/) is installe
 
 Qdrant images are available from Docker Hub: https://hub.docker.com/r/qdrant/qdrant
 
-To download or update the Qdrant Docker image: `docker pull qdrant/qdrant:v1.19.0`
+To download or update the Qdrant Docker image: `docker pull qdrant/qdrant:v1.20.0`
 
 To create a Docker container for Qdrant:
 
@@ -90,7 +90,7 @@ To create a Docker container for Qdrant:
 docker create --name qdrant \
     -p 6333:6333 -p 6334:6334 \
     -v qdrant-storage:/qdrant/storage \
-    qdrant/qdrant:v1.19.0
+    qdrant/qdrant:v1.20.0
 ```
 
 This command does the following:
