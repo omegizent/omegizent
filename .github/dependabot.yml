@@ -23,16 +23,16 @@ updates:
       timezone: "America/Los_Angeles"
     open-pull-requests-limit: 50
     groups:
-      tools-jackson:
+      maven-tools-jackson:
         patterns:
           - "tools.jackson.*"
-      org-slf4j:
+      maven-org-slf4j:
         patterns:
           - "org.slf4j:*"
-      org-mockito:
+      maven-org-mockito:
         patterns:
           - "org.mockito:*"
-      testing-plugins:
+      maven-testing-plugins:
         patterns:
           - "org.apache.maven.plugins:maven-failsafe-plugin"
           - "org.apache.maven.plugins:maven-surefire-plugin"
