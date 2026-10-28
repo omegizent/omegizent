@@ -52,7 +52,7 @@ You need [Python](https://www.python.org/) and [Poetry](https://python-poetry.or
 Omegizent is tested with the following versions, but other versions may also work:
 
 - Python:
-  - `3.14.7`
+  - `3.14.10`
 - Poetry:
   - `2.5.1`
 
