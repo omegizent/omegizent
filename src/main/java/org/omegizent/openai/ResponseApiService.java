@@ -189,6 +189,7 @@ public class ResponseApiService
             }
 
             ObjectNode requestNode = this.objectMapper.createObjectNode()
+                    .put( "store", true )
                     .put( "model", this.model )
                     .set( "tools", this.tools )
                     .set( "input", this.messages )
