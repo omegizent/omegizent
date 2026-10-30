@@ -171,6 +171,7 @@ public class ResponseApiService
                 .put( "content", query ));
 
         ObjectNode reasoningNode = this.objectMapper.createObjectNode()
+                .put( "context", "all_turns" )
                 .put( "effort", "medium" )
                 .put( "summary", "auto" );
 
