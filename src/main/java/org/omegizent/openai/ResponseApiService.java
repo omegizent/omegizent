@@ -172,7 +172,7 @@ public class ResponseApiService
 
         ObjectNode reasoningNode = this.objectMapper.createObjectNode()
                 .put( "effort", "medium" )
-                .put( "summary", "detailed" );
+                .put( "summary", "auto" );
 
         ArrayNode includeNode = this.objectMapper.createArrayNode()
                 .add( "reasoning.encrypted_content" )
