@@ -404,17 +404,18 @@ files = [
 
 [[package]]
 name = "langchain-core"
-version = "1.7.1"
+version = "1.7.3"
 description = "Building applications with LLMs through composability"
 optional = false
 python-versions = "<4.0.0,>=3.10.0"
 groups = ["main"]
 files = [
-    {file = "langchain_core-1.7.1-py3-none-any.whl", hash = "sha256:2d668788945e824832e19bca05788a25dbb864197d63ec48b583057cf8d975fa"},
-    {file = "langchain_core-1.7.1.tar.gz", hash = "sha256:5dc2a357e1aa40e84c7f29755182121b3acf04410e55fa3723915f645033fede"},
+    {file = "langchain_core-1.7.3-py3-none-any.whl", hash = "sha256:460c214bf31495d7b7e0a879e408dbfda677fd53fd879da786c1b966a4f6bff6"},
+    {file = "langchain_core-1.7.3.tar.gz", hash = "sha256:77f70b81e238c981bfd8405840b03fdf143735ac93c0729c2bdb39d6f0648024"},
 ]
 
 [package.dependencies]
+certifi = ">=2026.10.19"
 httpx = ">=0.23.0"
 jsonpatch = ">=1.33.0"
 langchain-protocol = ">=0.0.20"
