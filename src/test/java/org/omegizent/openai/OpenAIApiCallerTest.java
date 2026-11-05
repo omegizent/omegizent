@@ -20,8 +20,9 @@ package org.omegizent.openai;
 
 import org.omegizent.Environment;
 import org.omegizent.ConsoleLogger;
-import org.omegizent.OmegizentUtil;
 import org.omegizent.TaskRunner;
+import org.omegizent.ThreadUtil;
+import org.omegizent.TimeUtil;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -65,8 +66,9 @@ class OpenAIApiCallerTest
     @Mock private HttpRequestBuilder     mockHttpRequestBuilder;
     @Mock private HttpClient             mockHttpClient;
     @Mock private Random                 mockRandom;
-    @Mock private OmegizentUtil          mockOmegizentUtil_OpenAiApiCaller;
-    @Mock private OmegizentUtil          mockOmegizentUtil_TaskRunner;
+    @Mock private TimeUtil               mockTimeUtil;
+    @Mock private ThreadUtil             mockThreadUtil_OpenAiApiCaller;
+    @Mock private ThreadUtil             mockThreadUtil_TaskRunner;
     @Mock private ConsoleLogger          mockConsoleLogger;
     @Mock private HttpResponse< String > mockHttpResponse;
     @Mock private HttpHeaders            mockHttpHeaders;
@@ -167,7 +169,7 @@ class OpenAIApiCallerTest
 
         assertEquals( expectedMessage, exception.getMessage() );
 
-        verifyNoMoreInteractions( this.mockOmegizentUtil_OpenAiApiCaller );
+        verifyNoMoreInteractions( this.mockThreadUtil_OpenAiApiCaller );
     }
 
     @Test
@@ -202,21 +204,21 @@ class OpenAIApiCallerTest
 
         assertEquals( expectedMessage, exception.getMessage() );
 
-        InOrder inOrder = inOrder( this.mockConsoleLogger, this.mockOmegizentUtil_OpenAiApiCaller );
+        InOrder inOrder = inOrder( this.mockConsoleLogger, this.mockThreadUtil_OpenAiApiCaller );
         inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Starting" );
         inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Complete, Duration: 0 ms" );
         inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Rate Limit Exceeded, " +
                 "Attempt: 1, Raw Retry Delay: 20,000 ms, Retry Delay: 20,000 ms, Jitter: 1.150, Sleeping: 23,000 ms" );
-        inOrder.verify( this.mockOmegizentUtil_OpenAiApiCaller ).sleepThread( 23_000 );
+        inOrder.verify( this.mockThreadUtil_OpenAiApiCaller ).sleep( 23_000 );
         inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Starting" );
         inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Complete, Duration: 0 ms" );
         inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Rate Limit Exceeded, " +
                 "Attempt: 2, Raw Retry Delay: 20,000 ms, Retry Delay: 23,000 ms, Jitter: 2.000, Sleeping: 46,000 ms" );
-        inOrder.verify( this.mockOmegizentUtil_OpenAiApiCaller ).sleepThread( 46_000 );
+        inOrder.verify( this.mockThreadUtil_OpenAiApiCaller ).sleep( 46_000 );
         inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Starting" );
         inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Complete, Duration: 0 ms" );
         inOrder.verifyNoMoreInteractions();
-        verifyNoMoreInteractions( this.mockConsoleLogger, this.mockOmegizentUtil_OpenAiApiCaller );
+        verifyNoMoreInteractions( this.mockConsoleLogger, this.mockThreadUtil_OpenAiApiCaller );
     }
 
     @Test
@@ -241,7 +243,7 @@ class OpenAIApiCallerTest
         when( this.mockHttpResponse.headers() ).thenReturn( this.mockHttpHeaders );
         when( this.mockHttpHeaders.firstValueAsLong( "retry-after-ms" )).thenReturn( OptionalLong.of( 30_000 ));
         when( this.mockRandom.nextFloat() ).thenReturn( 0.25f );
-        doThrow( interruptedException ).when( this.mockOmegizentUtil_OpenAiApiCaller ).sleepThread( 33_750 );
+        doThrow( interruptedException ).when( this.mockThreadUtil_OpenAiApiCaller ).sleep( 33_750 );
 
         RuntimeException exception = assertThrowsExactly( RuntimeException.class,
                 () -> this.createOpenAiApiCaller().getResponse(
@@ -253,8 +255,8 @@ class OpenAIApiCallerTest
         assertEquals( expectedMessage, exception.getMessage() );
         assertEquals( interruptedException, exception.getCause() );
 
-        verify( this.mockOmegizentUtil_OpenAiApiCaller ).interruptThread();
-        verifyNoMoreInteractions( this.mockOmegizentUtil_OpenAiApiCaller );
+        verify( this.mockThreadUtil_OpenAiApiCaller ).interrupt();
+        verifyNoMoreInteractions( this.mockThreadUtil_OpenAiApiCaller );
     }
 
     @Test
@@ -283,16 +285,16 @@ class OpenAIApiCallerTest
 
         assertEquals( expectedResponseNode, actualResponseNode );
 
-        InOrder inOrder = inOrder( this.mockConsoleLogger, this.mockOmegizentUtil_OpenAiApiCaller );
+        InOrder inOrder = inOrder( this.mockConsoleLogger, this.mockThreadUtil_OpenAiApiCaller );
         inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Starting, Start Message" );
         inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Complete, Duration: 0 ms" );
         inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Rate Limit Exceeded, " +
                 "Attempt: 1, Raw Retry Delay: 5,000 ms, Retry Delay: 10,000 ms, Jitter: 1.175, Sleeping: 11,750 ms" );
-        inOrder.verify( this.mockOmegizentUtil_OpenAiApiCaller ).sleepThread( 11_750 );
+        inOrder.verify( this.mockThreadUtil_OpenAiApiCaller ).sleep( 11_750 );
         inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Starting, Start Message" );
         inOrder.verify( this.mockConsoleLogger ).println( "OpenAIApiCallerTest, Complete, Duration: 0 ms" );
         inOrder.verifyNoMoreInteractions();
-        verifyNoMoreInteractions( this.mockConsoleLogger, this.mockOmegizentUtil_OpenAiApiCaller );
+        verifyNoMoreInteractions( this.mockConsoleLogger, this.mockThreadUtil_OpenAiApiCaller );
     }
 
     @Test
@@ -407,12 +409,13 @@ class OpenAIApiCallerTest
         int  testMaxAttempts       = 3;
         long testMinimumRetryDelay = 10_000;
 
-        TaskRunner testTaskRunner = new TaskRunner( 0, this.mockOmegizentUtil_TaskRunner, this.mockConsoleLogger );
+        TaskRunner testTaskRunner =
+                new TaskRunner( 0, this.mockTimeUtil, this.mockThreadUtil_TaskRunner, this.mockConsoleLogger );
 
         return new OpenAiApiCaller(
                 testMaxAttempts, testMinimumRetryDelay, this.testApiKeyVarName, this.mockEnvironment,
                 this.mockHttpRequestBuilder, this.mockHttpClient, this.mockRandom,
-                this.mockOmegizentUtil_OpenAiApiCaller, this.mockConsoleLogger, testTaskRunner );
+                this.mockThreadUtil_OpenAiApiCaller, this.mockConsoleLogger, testTaskRunner );
     }
 
     private void mockApiCall( String response, int... statusCodes ) throws Exception

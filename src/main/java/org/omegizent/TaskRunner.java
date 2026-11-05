@@ -24,7 +24,8 @@ public class TaskRunner
     @FunctionalInterface public interface ThrowingSupplier< T > { T get() throws Exception; }
 
     private final long          rateLimitDelay;
-    private final OmegizentUtil omegizentUtil;
+    private final TimeUtil      timeUtil;
+    private final ThreadUtil    threadUtil;
     private final ConsoleLogger consoleLogger;
 
     private boolean runPreviously = false;
@@ -32,13 +33,14 @@ public class TaskRunner
 
     public TaskRunner( long rateLimitDelay )
     {
-        this( rateLimitDelay, new OmegizentUtil(), new ConsoleLogger() );
+        this( rateLimitDelay, new TimeUtil(), new ThreadUtil(), new ConsoleLogger() );
     }
 
-    public TaskRunner( long rateLimitDelay, OmegizentUtil omegizentUtil, ConsoleLogger consoleLogger )
+    public TaskRunner( long rateLimitDelay, TimeUtil timeUtil, ThreadUtil threadUtil, ConsoleLogger consoleLogger )
     {
         this.rateLimitDelay = rateLimitDelay;
-        this.omegizentUtil  = omegizentUtil;
+        this.timeUtil       = timeUtil;
+        this.threadUtil     = threadUtil;
         this.consoleLogger  = consoleLogger;
     }
 
@@ -55,7 +57,7 @@ public class TaskRunner
 
         if ( this.runPreviously )
         {
-            long initTime = this.omegizentUtil.nanoTime();
+            long initTime = this.timeUtil.nanoTime();
             long previousDeltaMs = ( initTime - this.previousStart ) / 1_000_000;
             long delayMs = this.rateLimitDelay - previousDeltaMs;
 
@@ -64,10 +66,10 @@ public class TaskRunner
                 if ( logTaskSummary )
                     this.consoleLogger.println( String.format( "%s, Sleeping, Duration: %,d ms", taskName, delayMs ));
 
-                try { this.omegizentUtil.sleepThread( delayMs ); }
+                try { this.threadUtil.sleep( delayMs ); }
                 catch ( InterruptedException e )
                 {
-                    this.omegizentUtil.interruptThread();
+                    this.threadUtil.interrupt();
                     throw new RuntimeException( taskName + ", Sleep Interrupted", e );
                 }
             }
@@ -81,20 +83,20 @@ public class TaskRunner
             this.consoleLogger.println( message );
         }
 
-        long startTime = this.omegizentUtil.nanoTime();
+        long startTime = this.timeUtil.nanoTime();
         this.previousStart = startTime;
 
         T result;
         try { result = task.get(); }
         catch ( InterruptedException e )
         {
-            this.omegizentUtil.interruptThread();
+            this.threadUtil.interrupt();
             throw new RuntimeException( taskName + ", Task Interrupted", e );
         }
         catch ( RuntimeException e ) { throw e; }
         catch ( Exception e ) { throw new RuntimeException( taskName + ", Exception Occurred", e ); }
 
-        long stopTime = this.omegizentUtil.nanoTime();
+        long stopTime = this.timeUtil.nanoTime();
         long deltaMs = ( stopTime - startTime ) / 1_000_000;
 
         if ( logTaskSummary )

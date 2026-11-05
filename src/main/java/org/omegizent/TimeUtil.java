@@ -1,6 +1,6 @@
 /*
 
-Copyright 2025-2026 Jeffrey J. Weston <jjweston@gmail.com>
+Copyright 2026 Jeffrey J. Weston <jjweston@gmail.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,22 +18,12 @@ limitations under the License.
 
 package org.omegizent;
 
-public class OmegizentUtil
+public class TimeUtil
 {
-    public OmegizentUtil() {}
+    TimeUtil() {}
 
     long nanoTime()
     {
         return System.nanoTime();
-    }
-
-    public void interruptThread()
-    {
-        Thread.currentThread().interrupt();
-    }
-
-    public void sleepThread( long millis ) throws InterruptedException
-    {
-        Thread.sleep( millis );
     }
 }

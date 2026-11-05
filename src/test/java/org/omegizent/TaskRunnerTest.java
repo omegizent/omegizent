@@ -36,7 +36,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith( MockitoExtension.class )
 class TaskRunnerTest
 {
-    @Mock private OmegizentUtil mockOmegizentUtil;
+    @Mock private TimeUtil      mockTimeUtil;
+    @Mock private ThreadUtil    mockThreadUtil;
     @Mock private ConsoleLogger mockConsoleLogger;
 
     private TaskRunner taskRunner;
@@ -44,7 +45,7 @@ class TaskRunnerTest
     @BeforeEach
     void setUp()
     {
-        this.taskRunner = new TaskRunner( 5_000, this.mockOmegizentUtil, this.mockConsoleLogger );
+        this.taskRunner = new TaskRunner( 5_000, this.mockTimeUtil, this.mockThreadUtil, this.mockConsoleLogger );
     }
 
     @Test
@@ -85,7 +86,7 @@ class TaskRunnerTest
                 () -> this.taskRunner.get( taskName, false, () -> { throw new InterruptedException(); } ));
 
         assertEquals( taskName + ", Task Interrupted", exception.getMessage() );
-        verify( this.mockOmegizentUtil ).interruptThread();
+        verify( this.mockThreadUtil ).interrupt();
     }
 
     @Test
@@ -118,7 +119,7 @@ class TaskRunnerTest
     {
         String taskName = "get_success_startMessage_rateLimited_sleepInterrupted";
 
-        when( this.mockOmegizentUtil.nanoTime() )
+        when( this.mockTimeUtil.nanoTime() )
                 .thenReturn(  1_000_000_000L )  // start #1 (first init is skipped)
                 .thenReturn(  2_250_000_000L )  // stop  #1
                 .thenReturn( 10_000_000_000L )  // init  #2
@@ -129,7 +130,7 @@ class TaskRunnerTest
                 .thenReturn( 21_750_000_000L )  // stop  #3
                 .thenReturn( 22_500_000_000L ); // init  #4 (final start and end are skipped)
 
-        doThrow( new InterruptedException() ).when( this.mockOmegizentUtil ).sleepThread( 2_500 );
+        doThrow( new InterruptedException() ).when( this.mockThreadUtil ).sleep( 2_500 );
 
         assertEquals( 42, this.taskRunner.get( taskName, null,            true, () -> 42 ));
         assertEquals( 43, this.taskRunner.get( taskName, "",              true, () -> 43 ));
@@ -140,7 +141,7 @@ class TaskRunnerTest
 
         assertEquals( taskName + ", Sleep Interrupted", exception.getMessage() );
 
-        InOrder inOrder = inOrder( this.mockOmegizentUtil, this.mockConsoleLogger );
+        InOrder inOrder = inOrder( this.mockThreadUtil, this.mockConsoleLogger );
 
         inOrder.verify( this.mockConsoleLogger ).println( taskName + ", Starting" );
         inOrder.verify( this.mockConsoleLogger ).println( taskName + ", Complete, Duration: 1,250 ms" );
@@ -149,9 +150,9 @@ class TaskRunnerTest
         inOrder.verify( this.mockConsoleLogger ).println( taskName + ", Starting, Start Message" );
         inOrder.verify( this.mockConsoleLogger ).println( taskName + ", Complete, Duration: 1,750 ms" );
         inOrder.verify( this.mockConsoleLogger ).println( taskName + ", Sleeping, Duration: 2,500 ms" );
-        inOrder.verify( this.mockOmegizentUtil ).interruptThread();
+        inOrder.verify( this.mockThreadUtil ).interrupt();
 
         inOrder.verifyNoMoreInteractions();
-        verifyNoMoreInteractions( this.mockOmegizentUtil, this.mockConsoleLogger );
+        verifyNoMoreInteractions( this.mockThreadUtil, this.mockConsoleLogger );
     }
 }
