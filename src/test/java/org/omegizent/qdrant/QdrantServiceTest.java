@@ -19,8 +19,9 @@ limitations under the License.
 package org.omegizent.qdrant;
 
 import org.omegizent.ConsoleLogger;
-import org.omegizent.OmegizentUtil;
 import org.omegizent.TaskRunner;
+import org.omegizent.ThreadUtil;
+import org.omegizent.TimeUtil;
 import org.omegizent.embedding.Embedding;
 import org.omegizent.embedding.ImmutableDoubleArray;
 
@@ -58,7 +59,8 @@ class QdrantServiceTest
     private final String testCollectionName = "test";
     private final int    testCollectionSize = 5;
 
-    @Mock private OmegizentUtil                                               mockOmegizentUtil;
+    @Mock private TimeUtil                                                    mockTimeUtil;
+    @Mock private ThreadUtil                                                  mockThreadUtil;
     @Mock private ConsoleLogger                                               mockConsoleLogger;
     @Mock private QdrantClientFactory                                         mockQdrantClientFactory;
     @Mock private QdrantClient                                                mockQdrantClient;
@@ -260,7 +262,7 @@ class QdrantServiceTest
 
     private QdrantService createQdrantService( int collectionSize, boolean logSummary )
     {
-        TaskRunner taskRunner = new TaskRunner( 0, this.mockOmegizentUtil, this.mockConsoleLogger );
+        TaskRunner taskRunner = new TaskRunner( 0, this.mockTimeUtil, this.mockThreadUtil, this.mockConsoleLogger );
         return new QdrantService(
                 this.testCollectionName, collectionSize, logSummary, taskRunner, this.mockQdrantClientFactory );
     }

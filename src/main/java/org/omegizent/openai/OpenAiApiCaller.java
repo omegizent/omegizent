@@ -20,8 +20,8 @@ package org.omegizent.openai;
 
 import org.omegizent.Environment;
 import org.omegizent.ConsoleLogger;
-import org.omegizent.OmegizentUtil;
 import org.omegizent.TaskRunner;
+import org.omegizent.ThreadUtil;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonPointer;
@@ -51,7 +51,7 @@ public class OpenAiApiCaller
     private final HttpRequestBuilder httpRequestBuilder;
     private final HttpClient         httpClient;
     private final Random             random;
-    private final OmegizentUtil      omegizentUtil;
+    private final ThreadUtil         threadUtil;
     private final ConsoleLogger      consoleLogger;
     private final TaskRunner         taskRunner;
     private final ObjectMapper       objectMapper;
@@ -69,14 +69,14 @@ public class OpenAiApiCaller
               new HttpRequestBuilder(),
               HttpClient.newHttpClient(),
               new Random(),
-              new OmegizentUtil(),
+              new ThreadUtil(),
               new ConsoleLogger(),
               new TaskRunner( 200 ));
     }
 
     OpenAiApiCaller( int maxAttempts, long minimumRetryDelay, String apiKeyVarName, Environment environment,
                      HttpRequestBuilder httpRequestBuilder, HttpClient httpClient, Random random,
-                     OmegizentUtil omegizentUtil, ConsoleLogger consoleLogger, TaskRunner taskRunner )
+                     ThreadUtil threadUtil, ConsoleLogger consoleLogger, TaskRunner taskRunner )
     {
         this.maxAttempts        = maxAttempts;
         this.minimumRetryDelay  = minimumRetryDelay;
@@ -85,7 +85,7 @@ public class OpenAiApiCaller
         this.httpRequestBuilder = httpRequestBuilder;
         this.httpClient         = httpClient;
         this.random             = random;
-        this.omegizentUtil      = omegizentUtil;
+        this.threadUtil         = threadUtil;
         this.consoleLogger      = consoleLogger;
         this.taskRunner         = taskRunner;
 
@@ -198,10 +198,10 @@ public class OpenAiApiCaller
                         taskName, attempt, rawRetryDelay, retryDelay, jitter, sleepDelay ));
             }
 
-            try { this.omegizentUtil.sleepThread( sleepDelay ); }
+            try { this.threadUtil.sleep( sleepDelay ); }
             catch ( InterruptedException e )
             {
-                this.omegizentUtil.interruptThread();
+                this.threadUtil.interrupt();
                 throw new RuntimeException( taskName + ", Retry Sleep Interrupted", e );
             }
         }
