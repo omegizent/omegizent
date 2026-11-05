@@ -84,7 +84,7 @@ class QdrantServiceTest
                 {
                     try ( QdrantService qdrantService = this.createQdrantService( this.testCollectionSize, false ))
                     {
-                        fail( "Should not get here. qdrantService: " + qdrantService );
+                        fail( "Should not get here. Qdrant Service: " + qdrantService );
                     }
                 } );
 
