@@ -43,7 +43,7 @@ Omegizent is tested with the following versions, but other versions may also wor
 - Eclipse Temurin:
   - `25.0.5+8-LTS` (Windows x64)
 - Apache Maven:
-  - `3.10.0`
+  - `3.10.1`
 
 ### Python
 
