@@ -46,8 +46,6 @@ public class EmbeddingCacheService
         this.logSummary    = logSummary;
         this.connection    = connection;
         this.consoleLogger = consoleLogger;
-
-        this.init();
     }
 
     Embedding getEmbedding( String input )
@@ -126,23 +124,5 @@ public class EmbeddingCacheService
         catch ( SQLException e ) { throw new RuntimeException( "Failed to get input.", e ); }
 
         throw new RuntimeException( String.format( "Unable to find embedding with id: %,d", id ));
-    }
-
-    private void init()
-    {
-        try
-        {
-            PreparedStatement statement = this.connection.prepareStatement(
-                    """
-                    CREATE TABLE IF NOT EXISTS Embedding
-                    (
-                        Id     INTEGER PRIMARY KEY AUTOINCREMENT,
-                        Input  TEXT    UNIQUE NOT NULL,
-                        Vector TEXT           NOT NULL
-                    )
-                    """ );
-            statement.execute();
-        }
-        catch ( SQLException e ) { throw new RuntimeException( "Failed to create Embeddings table.", e ); }
     }
 }

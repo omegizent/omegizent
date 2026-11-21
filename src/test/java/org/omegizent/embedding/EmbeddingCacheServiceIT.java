@@ -20,8 +20,9 @@ package org.omegizent.embedding;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.sqlite.SQLiteDataSource;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.nio.file.Path;
 import java.sql.Connection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,16 +31,13 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 class EmbeddingCacheServiceIT
 {
     @Test
-    void testCache() throws Exception
+    void testCache( @TempDir Path tempDir ) throws Exception
     {
         String testInput = "This is a test input.";
         ImmutableDoubleArray testVector = new ImmutableDoubleArray( new double[] { -0.75, -0.5, 0.5, 0.75 } );
+        SQLiteConnectionFactory sqLiteConnectionFactory = new SQLiteConnectionFactory( tempDir );
 
-        String databaseUrl = "jdbc:sqlite::memory:";
-        SQLiteDataSource dataSource = new SQLiteDataSource();
-        dataSource.setUrl( databaseUrl );
-
-        try ( Connection connection = dataSource.getConnection() )
+        try ( Connection connection = sqLiteConnectionFactory.create() )
         {
             EmbeddingCacheService embeddingCacheService = new EmbeddingCacheService( connection );
             Assertions.assertNull( embeddingCacheService.getEmbedding( testInput ));

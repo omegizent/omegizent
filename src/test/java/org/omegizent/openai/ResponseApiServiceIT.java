@@ -22,6 +22,7 @@ import org.omegizent.TestSupport;
 import org.omegizent.TaskRunner;
 import org.omegizent.embedding.EmbeddingCacheService;
 import org.omegizent.embedding.EmbeddingService;
+import org.omegizent.embedding.SQLiteConnectionFactory;
 import org.omegizent.ingest.markdown.MarkdownLoader;
 import org.omegizent.qdrant.QdrantClientFactory;
 import org.omegizent.qdrant.QdrantService;
@@ -29,7 +30,6 @@ import org.omegizent.qdrant.QdrantService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.sqlite.SQLiteDataSource;
 
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -83,11 +83,9 @@ class ResponseApiServiceIT
         String response1 = "Answer: Magic Carpet";
         String response2 = "Answer: What is the name of this software project?";
 
-        String databaseUrl = "jdbc:sqlite::memory:";
-        SQLiteDataSource dataSource = new SQLiteDataSource();
-        dataSource.setUrl( databaseUrl );
+        SQLiteConnectionFactory sqLiteConnectionFactory = new SQLiteConnectionFactory( tempDir );
 
-        try ( Connection connection = dataSource.getConnection();
+        try ( Connection connection = sqLiteConnectionFactory.create();
               QdrantService qdrantService = new QdrantService(
                       this.collectionName, collectionSize, false, this.taskRunner, this.qdrantClientFactory ))
         {

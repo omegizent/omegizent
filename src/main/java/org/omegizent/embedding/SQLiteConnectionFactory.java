@@ -18,6 +18,7 @@ limitations under the License.
 
 package org.omegizent.embedding;
 
+import org.flywaydb.core.Flyway;
 import org.sqlite.SQLiteDataSource;
 
 import java.io.IOException;
@@ -29,10 +30,19 @@ import java.sql.SQLException;
 
 public class SQLiteConnectionFactory
 {
-    private final Path workDirectory = Paths.get( "work" );
-    private final Path databaseFile  = Paths.get( "omegizent.db" );
+    private final Path workDirectory;
+    private final Path databaseFile;
 
-    public SQLiteConnectionFactory() {}
+    public SQLiteConnectionFactory()
+    {
+        this( Paths.get( "work" ));
+    }
+
+    public SQLiteConnectionFactory( Path workDirectory )
+    {
+        this.workDirectory = workDirectory;
+        this.databaseFile = Paths.get( "omegizent.db" );
+    }
 
     public Connection create()
     {
@@ -43,6 +53,8 @@ public class SQLiteConnectionFactory
         String databaseUrl = "jdbc:sqlite:" + databasePath;
         SQLiteDataSource dataSource = new SQLiteDataSource();
         dataSource.setUrl( databaseUrl );
+
+        Flyway.configure().dataSource( dataSource ).load().migrate();
 
         try { return dataSource.getConnection(); }
         catch ( SQLException e ) { throw new RuntimeException( "Failed to get database connection.", e ); }
