@@ -182,6 +182,7 @@ limitations under the License.
                 <version>3.11.0</version>
                 <executions>
                     <execution>
+                        <id>set-dependency-properties</id>
                         <goals>
                             <goal>properties</goal>
                         </goals>
