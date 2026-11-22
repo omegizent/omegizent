@@ -26,6 +26,12 @@ updates:
       maven-tools-jackson:
         patterns:
           - "tools.jackson.*"
+      maven-org-flywaydb:
+        patterns:
+          - "org.flywaydb:*"
+      maven-org-jooq:
+        patterns:
+          - "org.jooq:*"
       maven-org-slf4j:
         patterns:
           - "org.slf4j:*"
