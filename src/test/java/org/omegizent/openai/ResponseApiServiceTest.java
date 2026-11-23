@@ -19,9 +19,9 @@ limitations under the License.
 package org.omegizent.openai;
 
 import org.omegizent.ConsoleLogger;
-import org.omegizent.embedding.Embedding;
 import org.omegizent.embedding.EmbeddingCacheService;
 import org.omegizent.embedding.EmbeddingService;
+import org.omegizent.embedding.EmbeddingVector;
 import org.omegizent.embedding.ImmutableDoubleArray;
 import org.omegizent.qdrant.QdrantService;
 import org.omegizent.qdrant.SearchResult;
@@ -142,7 +142,7 @@ class ResponseApiServiceTest
         String userQuery = "What is a problem with an infinite solution?";
         String functionQuery = "What is infinity plus one?";
         ImmutableDoubleArray queryVector = new ImmutableDoubleArray( new double[] { 0.5, 0.4, 0.3, 0.2, 0.1 } );
-        Embedding queryEmbedding = new Embedding( 42, queryVector );
+        EmbeddingVector queryEmbeddingVector = new EmbeddingVector( 42, queryVector );
         SearchResult searchResult = new SearchResult( 7, 0.5f );
         List< SearchResult > searchResults = List.of( searchResult );
         String testSearchResult = "Infinity";
@@ -176,7 +176,7 @@ class ResponseApiServiceTest
                         any(), any() ))
                 .thenReturn( responseNode );
 
-        when( this.mockEmbeddingService.getEmbedding( functionQuery )).thenReturn( queryEmbedding );
+        when( this.mockEmbeddingService.getEmbedding( functionQuery )).thenReturn( queryEmbeddingVector );
         when( this.mockQdrantService.search( queryVector )).thenReturn( searchResults );
         when( this.mockEmbeddingCacheService.getInput( searchResult.id() )).thenReturn( testSearchResult );
 
@@ -233,13 +233,13 @@ class ResponseApiServiceTest
         float  expectedSearchResulScore2b = 0.125f;
 
         ImmutableDoubleArray queryVector1 = new ImmutableDoubleArray( new double[] { 0.5, 0.4, 0.3, 0.2, 0.1 } );
-        Embedding queryEmbedding1 = new Embedding( 42, queryVector1 );
+        EmbeddingVector queryEmbeddingVector1 = new EmbeddingVector( 42, queryVector1 );
         List< SearchResult > searchResults1 = List.of(
                 new SearchResult( expectedSearchResultId1a, expectedSearchResulScore1a ),
                 new SearchResult( expectedSearchResultId1b, expectedSearchResulScore1b ));
 
         ImmutableDoubleArray queryVector2 = new ImmutableDoubleArray( new double[] { 0.6, 0.5, 0.4, 0.3, 0.2 } );
-        Embedding queryEmbedding2 = new Embedding( 67, queryVector2 );
+        EmbeddingVector queryEmbeddingVector2 = new EmbeddingVector( 67, queryVector2 );
         List< SearchResult > searchResults2 = List.of(
                 new SearchResult( expectedSearchResultId2a, expectedSearchResulScore2a ),
                 new SearchResult( expectedSearchResultId2b, expectedSearchResulScore2b ));
@@ -317,14 +317,14 @@ class ResponseApiServiceTest
                     return responses.get( responseIndex.getAndIncrement() );
                 } );
 
-        when( this.mockEmbeddingService.getEmbedding( expectedFunctionQuery1 )).thenReturn( queryEmbedding1 );
+        when( this.mockEmbeddingService.getEmbedding( expectedFunctionQuery1 )).thenReturn( queryEmbeddingVector1 );
         when( this.mockQdrantService.search( queryVector1 )).thenReturn( searchResults1 );
         when( this.mockEmbeddingCacheService.getInput( expectedSearchResultId1a ))
                 .thenReturn( expectedSearchResultText1a );
         when( this.mockEmbeddingCacheService.getInput( expectedSearchResultId1b ))
                 .thenReturn( expectedSearchResultText1b );
 
-        when( this.mockEmbeddingService.getEmbedding( expectedFunctionQuery2 )).thenReturn( queryEmbedding2 );
+        when( this.mockEmbeddingService.getEmbedding( expectedFunctionQuery2 )).thenReturn( queryEmbeddingVector2 );
         when( this.mockQdrantService.search( queryVector2 )).thenReturn( searchResults2 );
         when( this.mockEmbeddingCacheService.getInput( expectedSearchResultId2a ))
                 .thenReturn( expectedSearchResultText2a );
@@ -460,7 +460,7 @@ class ResponseApiServiceTest
         String queryString = "What is your quest?";
         String testQuery = "Test Query";
         ImmutableDoubleArray queryVector = new ImmutableDoubleArray( new double[] { 0.5, 0.4, 0.3, 0.2, 0.1 } );
-        Embedding queryEmbedding = new Embedding( 42, queryVector );
+        EmbeddingVector queryEmbeddingVector = new EmbeddingVector( 42, queryVector );
         SearchResult searchResult = new SearchResult( 7, 0.5f );
         List< SearchResult > searchResults = List.of( searchResult );
         String testSearchResult = "Test Search Result";
@@ -504,7 +504,7 @@ class ResponseApiServiceTest
                         any(), any() ))
                 .thenReturn( responseNode );
 
-        when( this.mockEmbeddingService.getEmbedding( testQuery )).thenReturn( queryEmbedding );
+        when( this.mockEmbeddingService.getEmbedding( testQuery )).thenReturn( queryEmbeddingVector );
         when( this.mockQdrantService.search( queryVector )).thenReturn( searchResults );
         when( this.mockEmbeddingCacheService.getInput( searchResult.id() )).thenReturn( testSearchResult );
 

@@ -48,7 +48,7 @@ public class EmbeddingCacheService
         this.consoleLogger = consoleLogger;
     }
 
-    Embedding getEmbedding( String input )
+    EmbeddingVector getEmbedding( String input )
     {
         if ( input == null ) throw new IllegalArgumentException( "Input must not be null." );
         if ( input.isEmpty() ) throw new IllegalArgumentException( "Input must not be empty." );
@@ -64,7 +64,7 @@ public class EmbeddingCacheService
             {
                 long id = result.getLong( "Id" );
                 String vectorString = result.getString( "Vector" );
-                return new Embedding( id, new ImmutableDoubleArray( vectorString ));
+                return new EmbeddingVector( id, new ImmutableDoubleArray( vectorString ));
             }
         }
         catch ( SQLException e ) { throw new RuntimeException( "Failed to get embedding.", e ); }

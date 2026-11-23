@@ -41,8 +41,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith( MockitoExtension.class )
 class EmbeddingCacheServiceTest
 {
-    private final Embedding testEmbedding =
-            new Embedding( 42, new ImmutableDoubleArray( new double[] { -0.75, -0.5, 0.5, 0.75 } ));
+    private final EmbeddingVector testEmbeddingVector =
+            new EmbeddingVector( 42, new ImmutableDoubleArray( new double[] { -0.75, -0.5, 0.5, 0.75 } ));
 
     @Mock private ConsoleLogger     mockConsoleLogger;
     @Mock private Connection        mockConnection;
@@ -92,11 +92,11 @@ class EmbeddingCacheServiceTest
         when( this.mockConnection.prepareStatement( any() )).thenReturn( this.mockPreparedStatement );
         when( this.mockPreparedStatement.executeQuery() ).thenReturn( this.mockResultSet );
         when( this.mockResultSet.next() ).thenReturn( true );
-        when ( this.mockResultSet.getLong( "Id" )).thenReturn( this.testEmbedding.id() );
-        when ( this.mockResultSet.getString( "Vector" )).thenReturn( this.testEmbedding.vector().toString() );
+        when ( this.mockResultSet.getLong( "Id" )).thenReturn( this.testEmbeddingVector.id() );
+        when ( this.mockResultSet.getString( "Vector" )).thenReturn( this.testEmbeddingVector.vector().toString() );
 
-        Embedding actualEmbedding = embeddingCacheService.getEmbedding( "Test" );
-        assertEquals( this.testEmbedding, actualEmbedding );
+        EmbeddingVector actualEmbeddingVector = embeddingCacheService.getEmbedding( "Test" );
+        assertEquals( this.testEmbeddingVector, actualEmbeddingVector );
     }
 
     @Test
@@ -109,8 +109,8 @@ class EmbeddingCacheServiceTest
         when( this.mockPreparedStatement.executeQuery() ).thenReturn( this.mockResultSet );
         when( this.mockResultSet.next() ).thenReturn( false );
 
-        Embedding actualEmbedding = embeddingCacheService.getEmbedding( "Test" );
-        assertNull( actualEmbedding );
+        EmbeddingVector actualEmbeddingVector = embeddingCacheService.getEmbedding( "Test" );
+        assertNull( actualEmbeddingVector );
     }
 
     @Test
@@ -120,7 +120,7 @@ class EmbeddingCacheServiceTest
                 new EmbeddingCacheService( false, this.mockConnection, this.mockConsoleLogger );
 
         IllegalArgumentException exception = assertThrowsExactly( IllegalArgumentException.class,
-                () -> embeddingCacheService.cacheEmbedding( null, this.testEmbedding.vector() ));
+                () -> embeddingCacheService.cacheEmbedding( null, this.testEmbeddingVector.vector() ));
 
         assertEquals( "Input must not be null.", exception.getMessage() );
     }
@@ -132,7 +132,7 @@ class EmbeddingCacheServiceTest
                 new EmbeddingCacheService( false, this.mockConnection, this.mockConsoleLogger );
 
         IllegalArgumentException exception = assertThrowsExactly( IllegalArgumentException.class,
-                () -> embeddingCacheService.cacheEmbedding( "", this.testEmbedding.vector() ));
+                () -> embeddingCacheService.cacheEmbedding( "", this.testEmbeddingVector.vector() ));
 
         assertEquals( "Input must not be empty.", exception.getMessage() );
     }
@@ -172,7 +172,7 @@ class EmbeddingCacheServiceTest
         when( this.mockPreparedStatement.executeUpdate() ).thenReturn( 0 );
 
         IllegalArgumentException exception = assertThrowsExactly( IllegalArgumentException.class,
-                () -> embeddingCacheService.cacheEmbedding( "Test", this.testEmbedding.vector() ));
+                () -> embeddingCacheService.cacheEmbedding( "Test", this.testEmbeddingVector.vector() ));
 
         assertEquals( "Input must not be a duplicate.", exception.getMessage() );
     }
@@ -189,7 +189,7 @@ class EmbeddingCacheServiceTest
         when( this.mockPreparedStatement.getGeneratedKeys() ).thenReturn( this.mockResultSet );
         when( this.mockResultSet.next() ).thenReturn( true );
         when( this.mockResultSet.getLong( 1 )).thenReturn( 1_042L );
-        assertEquals( 1_042, embeddingCacheService.cacheEmbedding( "Test", this.testEmbedding.vector() ));
+        assertEquals( 1_042, embeddingCacheService.cacheEmbedding( "Test", this.testEmbeddingVector.vector() ));
 
         verify( this.mockConsoleLogger ).println( "Cache New Embedding, ID: 1,042" );
         verifyNoMoreInteractions( this.mockConsoleLogger );

@@ -19,7 +19,7 @@ limitations under the License.
 package org.omegizent.qdrant;
 
 import org.omegizent.TaskRunner;
-import org.omegizent.embedding.Embedding;
+import org.omegizent.embedding.EmbeddingVector;
 import org.omegizent.embedding.ImmutableDoubleArray;
 
 import io.qdrant.client.QdrantClient;
@@ -74,17 +74,17 @@ public class QdrantService implements AutoCloseable
         this.qdrantClient.close();
     }
 
-    public void upsert( Embedding embedding )
+    public void upsert( EmbeddingVector embeddingVector )
     {
-        if ( embedding == null ) throw new IllegalArgumentException( "Embedding must not be null." );
-        this.validateVector( embedding.vector() );
+        if ( embeddingVector == null ) throw new IllegalArgumentException( "Embedding vector must not be null." );
+        this.validateVector( embeddingVector.vector() );
 
         String taskName = "Qdrant - Upsert Point";
-        String startMessage = String.format( "Point ID: %,d", embedding.id() );
+        String startMessage = String.format( "Point ID: %,d", embeddingVector.id() );
 
         Points.PointStruct point = Points.PointStruct.newBuilder()
-                .setId( id( embedding.id() ))
-                .setVectors( VectorsFactory.vectors( embedding.vector().toFloatArray() ))
+                .setId( id( embeddingVector.id() ))
+                .setVectors( VectorsFactory.vectors( embeddingVector.vector().toFloatArray() ))
                 .build();
 
         this.taskRunner.run(

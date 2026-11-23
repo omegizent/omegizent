@@ -43,9 +43,9 @@ class EmbeddingCacheServiceIT
             Assertions.assertNull( embeddingCacheService.getEmbedding( testInput ));
             long id = embeddingCacheService.cacheEmbedding( testInput, testVector );
             assertEquals( testInput, embeddingCacheService.getInput( id ));
-            Embedding expectedEmbedding = new Embedding( id, testVector );
-            Embedding cachedEmbedding = embeddingCacheService.getEmbedding( testInput );
-            assertEquals( expectedEmbedding, cachedEmbedding );
+            EmbeddingVector expectedEmbeddingVector = new EmbeddingVector( id, testVector );
+            EmbeddingVector cachedEmbeddingVector = embeddingCacheService.getEmbedding( testInput );
+            assertEquals( expectedEmbeddingVector, cachedEmbeddingVector );
 
             IllegalArgumentException exception = assertThrowsExactly( IllegalArgumentException.class,
                     () -> embeddingCacheService.cacheEmbedding( testInput, testVector ) );

@@ -18,9 +18,9 @@ limitations under the License.
 
 package org.omegizent.cli;
 
-import org.omegizent.embedding.Embedding;
 import org.omegizent.embedding.EmbeddingCacheService;
 import org.omegizent.embedding.EmbeddingService;
+import org.omegizent.embedding.EmbeddingVector;
 import org.omegizent.embedding.SQLiteConnectionFactory;
 import org.omegizent.openai.EmbeddingApiService;
 import org.omegizent.openai.OpenAiApiCaller;
@@ -61,12 +61,12 @@ class Qdrant
 
             for ( String inputString : inputStrings )
             {
-                Embedding inputEmbedding = embeddingService.getEmbedding( inputString );
-                qdrantService.upsert( inputEmbedding );
+                EmbeddingVector inputEmbeddingVector = embeddingService.getEmbedding( inputString );
+                qdrantService.upsert( inputEmbeddingVector );
             }
 
-            Embedding queryEmbedding = embeddingService.getEmbedding( queryString );
-            List< SearchResult > searchResults = qdrantService.search( queryEmbedding.vector() );
+            EmbeddingVector queryEmbeddingVector = embeddingService.getEmbedding( queryString );
+            List< SearchResult > searchResults = qdrantService.search( queryEmbeddingVector.vector() );
 
             for (  SearchResult searchResult : searchResults )
             {
