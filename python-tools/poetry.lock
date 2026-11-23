@@ -404,21 +404,21 @@ files = [
 
 [[package]]
 name = "langchain-core"
-version = "1.8.3"
+version = "1.8.4"
 description = "Building applications with LLMs through composability"
 optional = false
 python-versions = "<4.0.0,>=3.11.0"
 groups = ["main"]
 files = [
-    {file = "langchain_core-1.8.3-py3-none-any.whl", hash = "sha256:4d2764d2ab4faf3fec9f17515f15c0d3485a6ef55f75c088f6929944225ff578"},
-    {file = "langchain_core-1.8.3.tar.gz", hash = "sha256:ce448f055dd2cf1db7def27d2b6c2902519369642e8b89d08255c7ca7abd6b36"},
+    {file = "langchain_core-1.8.4-py3-none-any.whl", hash = "sha256:5755dee8f8b0c709cd22436dea3689c74a3f6e9dc4251590797dcd66bcd1ef67"},
+    {file = "langchain_core-1.8.4.tar.gz", hash = "sha256:af8976d6df0b3338dc7c830ebf1c505c0fc05a0e3eb564f4901ed7546a418ab6"},
 ]
 
 [package.dependencies]
 certifi = ">=2026.10.19"
 httpx = ">=0.23.0"
 jsonpatch = ">=1.33.0"
-langchain-protocol = ">=0.0.20"
+langchain-protocol = ">=0.0.22"
 langsmith = ">=0.14.9,<1.0.0"
 packaging = ">=23.2.0"
 pydantic = ">=2.7.4,<3.0.0"
