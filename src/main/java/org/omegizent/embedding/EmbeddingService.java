@@ -36,13 +36,13 @@ public class EmbeddingService
         this.embeddingApiService   = embeddingApiService;
     }
 
-    public Embedding getEmbedding( String input )
+    public EmbeddingVector getEmbedding( String input )
     {
-        Embedding embedding = this.embeddingCacheService.getEmbedding( input );
-        if ( embedding != null ) return embedding;
+        EmbeddingVector embeddingVector = this.embeddingCacheService.getEmbedding( input );
+        if ( embeddingVector != null ) return embeddingVector;
 
         ImmutableDoubleArray vector = this.embeddingApiService.getEmbeddingVector( input );
         long id = this.embeddingCacheService.cacheEmbedding( input, vector );
-        return new Embedding( id, vector );
+        return new EmbeddingVector( id, vector );
     }
 }

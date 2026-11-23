@@ -1,6 +1,6 @@
 /*
 
-Copyright 2025 Jeffrey J. Weston <jjweston@gmail.com>
+Copyright 2025-2026 Jeffrey J. Weston <jjweston@gmail.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,10 +18,19 @@ limitations under the License.
 
 package org.omegizent.embedding;
 
-public record Embedding( long id, ImmutableDoubleArray vector )
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+
+class EmbeddingVectorTest
 {
-    public Embedding
+    @Test
+    void constructor_nullVector()
     {
-        if ( vector == null ) throw new IllegalArgumentException( "Vector must not be null." );
+        IllegalArgumentException exception = assertThrowsExactly(
+                IllegalArgumentException.class, () -> new EmbeddingVector( 1, null ));
+
+        assertEquals( "Vector must not be null.", exception.getMessage() );
     }
 }

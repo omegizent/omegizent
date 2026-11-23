@@ -19,9 +19,9 @@ limitations under the License.
 package org.omegizent.openai;
 
 import org.omegizent.ConsoleLogger;
-import org.omegizent.embedding.Embedding;
 import org.omegizent.embedding.EmbeddingCacheService;
 import org.omegizent.embedding.EmbeddingService;
+import org.omegizent.embedding.EmbeddingVector;
 import org.omegizent.qdrant.QdrantService;
 import org.omegizent.qdrant.SearchResult;
 
@@ -328,8 +328,8 @@ public class ResponseApiService
             this.consoleLogger.println( String.format( "%s, Search Readme: %s", this.taskName, query ));
         }
 
-        Embedding queryEmbedding = this.embeddingService.getEmbedding( query );
-        List< SearchResult > searchResults = this.qdrantService.search( queryEmbedding.vector() );
+        EmbeddingVector queryEmbeddingVector = this.embeddingService.getEmbedding( query );
+        List< SearchResult > searchResults = this.qdrantService.search( queryEmbeddingVector.vector() );
 
         int maxIdLength = !this.logFunctionCalls ? 1 : searchResults.stream()
                 .mapToInt( searchResult -> String.format( "%,d", searchResult.id() ).length() )

@@ -18,8 +18,8 @@ limitations under the License.
 
 package org.omegizent.ingest.markdown;
 
-import org.omegizent.embedding.Embedding;
 import org.omegizent.embedding.EmbeddingService;
+import org.omegizent.embedding.EmbeddingVector;
 import org.omegizent.embedding.ImmutableDoubleArray;
 import org.omegizent.qdrant.QdrantService;
 
@@ -88,22 +88,26 @@ class MarkdownLoaderTest
         testChunks.add( "Chunk 2" );
         testChunks.add( "Chunk 3" );
 
-        Embedding testEmbedding1 = new Embedding( 42, new ImmutableDoubleArray( new double[] { 0.1, -0.1 } ));
-        Embedding testEmbedding2 = new Embedding( 13, new ImmutableDoubleArray( new double[] { 0.2, -0.2 } ));
-        Embedding testEmbedding3 = new Embedding( 67, new ImmutableDoubleArray( new double[] { 0.3, -0.3 } ));
+        ImmutableDoubleArray testVector1 = new ImmutableDoubleArray( new double[] { 0.1, -0.1 } );
+        ImmutableDoubleArray testVector2 = new ImmutableDoubleArray( new double[] { 0.2, -0.2 } );
+        ImmutableDoubleArray testVector3 = new ImmutableDoubleArray( new double[] { 0.3, -0.3 } );
+
+        EmbeddingVector testEmbeddingVector1 = new EmbeddingVector( 42, testVector1 );
+        EmbeddingVector testEmbeddingVector2 = new EmbeddingVector( 13, testVector2 );
+        EmbeddingVector testEmbeddingVector3 = new EmbeddingVector( 67, testVector3 );
 
         MarkdownLoader markdownLoader = new MarkdownLoader(
                 this.mockMarkdownSplitter, this.mockEmbeddingService, this.mockQdrantService );
 
         when( this.mockMarkdownSplitter.split( testPath )).thenReturn( testChunks );
-        when( this.mockEmbeddingService.getEmbedding( testChunks.get( 0 ))).thenReturn( testEmbedding1 );
-        when( this.mockEmbeddingService.getEmbedding( testChunks.get( 1 ))).thenReturn( testEmbedding2 );
-        when( this.mockEmbeddingService.getEmbedding( testChunks.get( 2 ))).thenReturn( testEmbedding3 );
+        when( this.mockEmbeddingService.getEmbedding( testChunks.get( 0 ))).thenReturn( testEmbeddingVector1 );
+        when( this.mockEmbeddingService.getEmbedding( testChunks.get( 1 ))).thenReturn( testEmbeddingVector2 );
+        when( this.mockEmbeddingService.getEmbedding( testChunks.get( 2 ))).thenReturn( testEmbeddingVector3 );
 
         markdownLoader.load( testPath );
 
-        verify( this.mockQdrantService ).upsert( testEmbedding1 );
-        verify( this.mockQdrantService ).upsert( testEmbedding2 );
-        verify( this.mockQdrantService ).upsert( testEmbedding3 );
+        verify( this.mockQdrantService ).upsert( testEmbeddingVector1 );
+        verify( this.mockQdrantService ).upsert( testEmbeddingVector2 );
+        verify( this.mockQdrantService ).upsert( testEmbeddingVector3 );
     }
 }

@@ -20,7 +20,7 @@ package org.omegizent.qdrant;
 
 import org.omegizent.TestSupport;
 import org.omegizent.TaskRunner;
-import org.omegizent.embedding.Embedding;
+import org.omegizent.embedding.EmbeddingVector;
 import org.omegizent.embedding.ImmutableDoubleArray;
 
 import org.junit.jupiter.api.AfterEach;
@@ -68,8 +68,8 @@ class QdrantServiceIT
                 String resourceName = String.format( "%s-input-%d.json", className, i );
                 long id = i + 1;
                 ImmutableDoubleArray inputVector = this.getVector( resourceName );
-                Embedding embedding = new Embedding( id, inputVector );
-                qdrantService.upsert( embedding );
+                EmbeddingVector embeddingVector = new EmbeddingVector( id, inputVector );
+                qdrantService.upsert( embeddingVector );
             }
 
             String resourceName = className + "-query.json";

@@ -22,7 +22,7 @@ import org.omegizent.ConsoleLogger;
 import org.omegizent.TaskRunner;
 import org.omegizent.ThreadUtil;
 import org.omegizent.TimeUtil;
-import org.omegizent.embedding.Embedding;
+import org.omegizent.embedding.EmbeddingVector;
 import org.omegizent.embedding.ImmutableDoubleArray;
 
 import com.google.common.util.concurrent.ListenableFuture;
@@ -94,7 +94,7 @@ class QdrantServiceTest
     }
 
     @Test
-    void upsert_nullEmbedding() throws Exception
+    void upsert_nullEmbeddingVector() throws Exception
     {
         this.mockInit( this.testCollectionSize );
 
@@ -107,7 +107,7 @@ class QdrantServiceTest
                     }
                 } );
 
-        assertEquals( "Embedding must not be null.", exception.getMessage() );
+        assertEquals( "Embedding vector must not be null.", exception.getMessage() );
     }
 
     @Test
@@ -117,7 +117,7 @@ class QdrantServiceTest
         int                  actualCollectionSize   = 1_024;
         long                 testId                 = 42;
         ImmutableDoubleArray testVector             = new ImmutableDoubleArray( new double[ actualCollectionSize ] );
-        Embedding            testEmbedding          = new Embedding( testId, testVector );
+        EmbeddingVector      testEmbeddingVector    = new EmbeddingVector( testId, testVector );
 
         this.mockInit( expectedCollectionSize );
 
@@ -126,7 +126,7 @@ class QdrantServiceTest
                 {
                     try ( QdrantService qdrantService = this.createQdrantService( expectedCollectionSize, false ))
                     {
-                        qdrantService.upsert( testEmbedding );
+                        qdrantService.upsert( testEmbeddingVector );
                     }
                 } );
 
@@ -136,9 +136,10 @@ class QdrantServiceTest
     @Test
     void upsert_success() throws Exception
     {
-        long                 testId        = 1024;
-        ImmutableDoubleArray testVector    = new ImmutableDoubleArray( new double[]{ 0.1f, 0.2f, 0.3f, 0.4f, 0.5f } );
-        Embedding            testEmbedding = new Embedding( testId, testVector );
+        long                 testId     = 1_024;
+        ImmutableDoubleArray testVector = new ImmutableDoubleArray( new double[]{ 0.1f, 0.2f, 0.3f, 0.4f, 0.5f } );
+
+        EmbeddingVector testEmbeddingVector = new EmbeddingVector( testId, testVector );
 
         Points.PointStruct testPoint = Points.PointStruct.newBuilder()
                 .setId( id( testId ))
@@ -153,7 +154,7 @@ class QdrantServiceTest
         try ( QdrantService qdrantService = this.createQdrantService( this.testCollectionSize, true ))
         {
             clearInvocations( this.mockConsoleLogger );
-            qdrantService.upsert( testEmbedding );
+            qdrantService.upsert( testEmbeddingVector );
         }
 
         InOrder inOrder = inOrder( this.mockConsoleLogger );

@@ -34,8 +34,8 @@ class EmbeddingServiceTest
 {
     private final String testString = "Test";
 
-    private final Embedding testEmbedding =
-            new Embedding( 42, new ImmutableDoubleArray( new double[] { -0.75, -0.5, 0.5, 0.75 } ));
+    private final EmbeddingVector testEmbeddingVector =
+            new EmbeddingVector( 42, new ImmutableDoubleArray( new double[] { -0.75, -0.5, 0.5, 0.75 } ));
 
     @Mock private EmbeddingCacheService mockEmbeddingCacheService;
     @Mock private EmbeddingApiService   mockEmbeddingApiService;
@@ -66,9 +66,9 @@ class EmbeddingServiceTest
         EmbeddingService embeddingService =
                 new EmbeddingService( this.mockEmbeddingCacheService, this.mockEmbeddingApiService );
 
-        when( this.mockEmbeddingCacheService.getEmbedding( this.testString )).thenReturn( this.testEmbedding );
-        Embedding actualEmbedding = embeddingService.getEmbedding( this.testString );
-        assertEquals( this.testEmbedding, actualEmbedding );
+        when( this.mockEmbeddingCacheService.getEmbedding( this.testString )).thenReturn( this.testEmbeddingVector );
+        EmbeddingVector actualEmbeddingVector = embeddingService.getEmbedding( this.testString );
+        assertEquals( this.testEmbeddingVector, actualEmbeddingVector );
     }
 
     @Test
@@ -79,10 +79,10 @@ class EmbeddingServiceTest
 
         when( this.mockEmbeddingCacheService.getEmbedding( this.testString )).thenReturn( null );
         when( this.mockEmbeddingApiService.getEmbeddingVector( this.testString )).
-                thenReturn( this.testEmbedding.vector() );
-        when( this.mockEmbeddingCacheService.cacheEmbedding( this.testString, this.testEmbedding.vector() ))
-                .thenReturn( this.testEmbedding.id() );
-        Embedding actualEmbedding = embeddingService.getEmbedding( this.testString );
-        assertEquals( this.testEmbedding, actualEmbedding );
+                thenReturn( this.testEmbeddingVector.vector() );
+        when( this.mockEmbeddingCacheService.cacheEmbedding( this.testString, this.testEmbeddingVector.vector() ))
+                .thenReturn( this.testEmbeddingVector.id() );
+        EmbeddingVector actualEmbeddingVector = embeddingService.getEmbedding( this.testString );
+        assertEquals( this.testEmbeddingVector, actualEmbeddingVector );
     }
 }
