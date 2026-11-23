@@ -377,14 +377,14 @@ all = ["coverage (>=7.10.0)", "hypothesis (>=6.141.1)", "mypy (>=1.11.2)", "pyte
 
 [[package]]
 name = "jsonpatch"
-version = "1.47"
+version = "1.48"
 description = "Apply JSON-Patches (RFC 6902) "
 optional = false
 python-versions = ">=3.11"
 groups = ["main"]
 files = [
-    {file = "jsonpatch-1.47-py3-none-any.whl", hash = "sha256:c9ba6de59c481bf2be05041514ecb0d97f994aa645c4e00831805dbe2281811a"},
-    {file = "jsonpatch-1.47.tar.gz", hash = "sha256:5ed650b7517789e0f43428aa7b09442c0b90de0a0fd17a53fd0ebf55205c601e"},
+    {file = "jsonpatch-1.48-py3-none-any.whl", hash = "sha256:389f25f006940b7bc939c33ca0f6cf8875527dc70599520652a269040ce40b63"},
+    {file = "jsonpatch-1.48.tar.gz", hash = "sha256:81e9a03754137a1201d9b534ddd599cc0eb5983fe941bce238dc8a76e442bb94"},
 ]
 
 [package.dependencies]
