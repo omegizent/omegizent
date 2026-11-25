@@ -249,6 +249,12 @@ limitations under the License.
                     <generator>
                         <database>
                             <excludes>flyway_schema_history</excludes>
+                            <forcedTypes>
+                                <forcedType>
+                                    <name>BIGINT</name>
+                                    <includeTypes>INTEGER</includeTypes>
+                                </forcedType>
+                            </forcedTypes>
                         </database>
                         <target>
                             <packageName>org.omegizent.generated.jooq</packageName>
