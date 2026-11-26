@@ -18,6 +18,7 @@ limitations under the License.
 
 package org.omegizent.embedding;
 
+import org.jooq.impl.DSL;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -39,7 +40,7 @@ class EmbeddingCacheServiceIT
 
         try ( Connection connection = sqLiteConnectionFactory.create() )
         {
-            EmbeddingCacheService embeddingCacheService = new EmbeddingCacheService( connection );
+            EmbeddingCacheService embeddingCacheService = new EmbeddingCacheService( DSL.using( connection ));
             Assertions.assertNull( embeddingCacheService.getEmbedding( testInput ));
             long id = embeddingCacheService.cacheEmbedding( testInput, testVector );
             assertEquals( testInput, embeddingCacheService.getInput( id ));
@@ -48,7 +49,7 @@ class EmbeddingCacheServiceIT
             assertEquals( expectedEmbeddingVector, cachedEmbeddingVector );
 
             IllegalArgumentException exception = assertThrowsExactly( IllegalArgumentException.class,
-                    () -> embeddingCacheService.cacheEmbedding( testInput, testVector ) );
+                    () -> embeddingCacheService.cacheEmbedding( testInput, testVector ));
 
             assertEquals( "Input must not be a duplicate.", exception.getMessage() );
         }

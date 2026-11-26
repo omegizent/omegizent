@@ -41,6 +41,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.jooq.impl.DSL;
 
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -65,7 +66,7 @@ public class QueryGui extends Application
         this.connection = sqLiteConnectionFactory.create();
         this.qdrantService = new QdrantService();
         OpenAiApiCaller openAiApiCaller = new OpenAiApiCaller();
-        EmbeddingCacheService embeddingCacheService = new EmbeddingCacheService( this.connection );
+        EmbeddingCacheService embeddingCacheService = new EmbeddingCacheService( DSL.using( this.connection ));
         EmbeddingApiService embeddingApiService = new EmbeddingApiService( openAiApiCaller );
         EmbeddingService embeddingService = new EmbeddingService( embeddingCacheService, embeddingApiService );
         this.responseApiService = new ResponseApiService(

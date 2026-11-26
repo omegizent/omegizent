@@ -19,32 +19,31 @@ limitations under the License.
 package org.omegizent.embedding;
 
 import org.omegizent.ConsoleLogger;
+import org.omegizent.generated.jooq.tables.records.EmbeddingRecord;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import org.jooq.DSLContext;
+
+import static org.omegizent.generated.jooq.Tables.EMBEDDING;
 
 public class EmbeddingCacheService
 {
     private final boolean       logSummary;
-    private final Connection    connection;
+    private final DSLContext    dslContext;
     private final ConsoleLogger consoleLogger;
 
-    public EmbeddingCacheService( Connection connection )
+    public EmbeddingCacheService( DSLContext dslContext )
     {
         boolean logSummary = false;
 
-        this( logSummary, connection, new ConsoleLogger() );
+        this( logSummary, dslContext, new ConsoleLogger() );
     }
 
-    EmbeddingCacheService( boolean logSummary, Connection connection, ConsoleLogger consoleLogger )
+    EmbeddingCacheService( boolean logSummary, DSLContext dslContext, ConsoleLogger consoleLogger )
     {
-        if ( connection == null ) throw new IllegalArgumentException( "Connection must not be null." );
+        if ( dslContext == null ) throw new IllegalArgumentException( "DSL context must not be null." );
 
         this.logSummary    = logSummary;
-        this.connection    = connection;
+        this.dslContext    = dslContext;
         this.consoleLogger = consoleLogger;
     }
 
@@ -53,23 +52,9 @@ public class EmbeddingCacheService
         if ( input == null ) throw new IllegalArgumentException( "Input must not be null." );
         if ( input.isEmpty() ) throw new IllegalArgumentException( "Input must not be empty." );
 
-        try
-        {
-            PreparedStatement statement = this.connection.prepareStatement(
-                    "SELECT Id, Vector FROM Embedding WHERE Input = ?" );
-            statement.setString( 1, input );
-            ResultSet result = statement.executeQuery();
-
-            if ( result.next() )
-            {
-                long id = result.getLong( "Id" );
-                String vectorString = result.getString( "Vector" );
-                return new EmbeddingVector( id, new ImmutableDoubleArray( vectorString ));
-            }
-        }
-        catch ( SQLException e ) { throw new RuntimeException( "Failed to get embedding.", e ); }
-
-        return null;
+        EmbeddingRecord embeddingRecord = this.dslContext.fetchOne( EMBEDDING, EMBEDDING.INPUT.eq( input ));
+        if ( embeddingRecord == null ) return null;
+        return new EmbeddingVector( embeddingRecord.getId(), new ImmutableDoubleArray( embeddingRecord.getVector() ));
     }
 
     long cacheEmbedding( String input, ImmutableDoubleArray vector )
@@ -80,49 +65,23 @@ public class EmbeddingCacheService
         if ( vector == null ) throw new IllegalArgumentException( "Vector must not be null." );
         if ( vector.length() == 0 ) throw new IllegalArgumentException( "Vector must not be empty." );
 
-        try
-        {
-            PreparedStatement statement = this.connection.prepareStatement(
-                    "INSERT OR IGNORE INTO Embedding ( Input, Vector ) VALUES ( ?, ? )",
-                    Statement.RETURN_GENERATED_KEYS );
-            statement.setString( 1, input );
-            statement.setString( 2, vector.toString() );
+        int rowCount = this.dslContext
+                .insertInto( EMBEDDING, EMBEDDING.INPUT, EMBEDDING.VECTOR )
+                .values( input, vector.toString() )
+                .onDuplicateKeyIgnore()
+                .execute();
 
-            if ( statement.executeUpdate() == 0 )
-            {
-                throw new IllegalArgumentException( "Input must not be a duplicate." );
-            }
+        if ( rowCount == 0 ) throw new IllegalArgumentException( "Input must not be a duplicate." );
 
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            if ( generatedKeys.next() )
-            {
-                long id = generatedKeys.getLong( 1 );
-
-                if ( this.logSummary )
-                {
-                    this.consoleLogger.println( String.format( "Cache New Embedding, ID: %,d", id ));
-                }
-
-                return id;
-            }
-            else throw new RuntimeException( "Failed to get ID of added embedding." );
-        }
-        catch ( SQLException e ) { throw new RuntimeException( "Failed to insert into Embeddings table.", e ); }
+        long id = this.dslContext.lastID().longValueExact();
+        if ( this.logSummary ) this.consoleLogger.println( String.format( "Cache New Embedding, ID: %,d", id ));
+        return id;
     }
 
     public String getInput( long id )
     {
-        try
-        {
-            PreparedStatement statement = this.connection.prepareStatement(
-                    "SELECT Input FROM Embedding WHERE Id = ?" );
-            statement.setLong( 1, id );
-            ResultSet result = statement.executeQuery();
-
-            if ( result.next() ) return result.getString( "Input" );
-        }
-        catch ( SQLException e ) { throw new RuntimeException( "Failed to get input.", e ); }
-
+        String input = this.dslContext.fetchValue( EMBEDDING.INPUT, EMBEDDING.ID.eq( id ));
+        if ( input != null ) return input;
         throw new RuntimeException( String.format( "Unable to find embedding with id: %,d", id ));
     }
 }

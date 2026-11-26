@@ -19,24 +19,25 @@ limitations under the License.
 package org.omegizent.embedding;
 
 import org.omegizent.ConsoleLogger;
+import org.omegizent.generated.jooq.tables.records.EmbeddingRecord;
 
+import org.jooq.DSLContext;
+import org.jooq.InsertReturningStep;
+import org.jooq.InsertValuesStep2;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.omegizent.generated.jooq.Tables.EMBEDDING;
 
 @ExtendWith( MockitoExtension.class )
 class EmbeddingCacheServiceTest
@@ -44,26 +45,26 @@ class EmbeddingCacheServiceTest
     private final EmbeddingVector testEmbeddingVector =
             new EmbeddingVector( 42, new ImmutableDoubleArray( new double[] { -0.75, -0.5, 0.5, 0.75 } ));
 
-    @Mock private ConsoleLogger     mockConsoleLogger;
-    @Mock private Connection        mockConnection;
-    @Mock private PreparedStatement mockPreparedStatement;
-    @Mock private ResultSet         mockResultSet;
+    @Mock private DSLContext                                           mockDSLContext;
+    @Mock private ConsoleLogger                                        mockConsoleLogger;
+    @Mock private InsertValuesStep2< EmbeddingRecord, String, String > mockInsertValuesStep2;
+    @Mock private InsertReturningStep< EmbeddingRecord >               mockReturningStep;
 
     @Test
-    void testConstructor_nullConnection()
+    void testConstructor_nullDSLContext()
     {
         @SuppressWarnings( "DataFlowIssue" )
         IllegalArgumentException exception = assertThrowsExactly( IllegalArgumentException.class,
                 () -> new EmbeddingCacheService( false, null, this.mockConsoleLogger ));
 
-        assertEquals( "Connection must not be null.", exception.getMessage() );
+        assertEquals( "DSL context must not be null.", exception.getMessage() );
     }
 
     @Test
     void testGetEmbedding_nullInput()
     {
         EmbeddingCacheService embeddingCacheService =
-                new EmbeddingCacheService( false, this.mockConnection, this.mockConsoleLogger );
+                new EmbeddingCacheService( false, this.mockDSLContext, this.mockConsoleLogger );
 
         IllegalArgumentException exception = assertThrowsExactly( IllegalArgumentException.class,
                 () -> embeddingCacheService.getEmbedding( null ));
@@ -75,7 +76,7 @@ class EmbeddingCacheServiceTest
     void testGetEmbedding_emptyInput()
     {
         EmbeddingCacheService embeddingCacheService =
-                new EmbeddingCacheService( false, this.mockConnection, this.mockConsoleLogger );
+                new EmbeddingCacheService( false, this.mockDSLContext, this.mockConsoleLogger );
 
         IllegalArgumentException exception = assertThrowsExactly( IllegalArgumentException.class,
                 () -> embeddingCacheService.getEmbedding( "" ));
@@ -84,40 +85,40 @@ class EmbeddingCacheServiceTest
     }
 
     @Test
-    void testGetEmbedding_cacheHit() throws Exception
+    void testGetEmbedding_cacheHit()
     {
+        String testInput = "Test";
+
+        EmbeddingRecord testEmbeddingRecord = new EmbeddingRecord(
+                this.testEmbeddingVector.id(), testInput, this.testEmbeddingVector.vector().toString() );
+
+        when( this.mockDSLContext.fetchOne( EMBEDDING, EMBEDDING.INPUT.eq( testInput )))
+                .thenReturn( testEmbeddingRecord );
+
         EmbeddingCacheService embeddingCacheService =
-                new EmbeddingCacheService( false, this.mockConnection, this.mockConsoleLogger );
+                new EmbeddingCacheService( false, this.mockDSLContext, this.mockConsoleLogger );
 
-        when( this.mockConnection.prepareStatement( any() )).thenReturn( this.mockPreparedStatement );
-        when( this.mockPreparedStatement.executeQuery() ).thenReturn( this.mockResultSet );
-        when( this.mockResultSet.next() ).thenReturn( true );
-        when ( this.mockResultSet.getLong( "Id" )).thenReturn( this.testEmbeddingVector.id() );
-        when ( this.mockResultSet.getString( "Vector" )).thenReturn( this.testEmbeddingVector.vector().toString() );
-
-        EmbeddingVector actualEmbeddingVector = embeddingCacheService.getEmbedding( "Test" );
-        assertEquals( this.testEmbeddingVector, actualEmbeddingVector );
+        assertEquals( this.testEmbeddingVector, embeddingCacheService.getEmbedding( testInput ));
     }
 
     @Test
-    void testGetEmbedding_cacheMiss() throws Exception
+    void testGetEmbedding_cacheMiss()
     {
+        String testInput = "Test";
+
+        when( this.mockDSLContext.fetchOne( EMBEDDING, EMBEDDING.INPUT.eq( testInput ))).thenReturn( null );
+
         EmbeddingCacheService embeddingCacheService =
-                new EmbeddingCacheService( false, this.mockConnection, this.mockConsoleLogger );
+                new EmbeddingCacheService( false, this.mockDSLContext, this.mockConsoleLogger );
 
-        when( this.mockConnection.prepareStatement( any() )).thenReturn( this.mockPreparedStatement );
-        when( this.mockPreparedStatement.executeQuery() ).thenReturn( this.mockResultSet );
-        when( this.mockResultSet.next() ).thenReturn( false );
-
-        EmbeddingVector actualEmbeddingVector = embeddingCacheService.getEmbedding( "Test" );
-        assertNull( actualEmbeddingVector );
+        assertNull( embeddingCacheService.getEmbedding( testInput ));
     }
 
     @Test
     void testCacheEmbedding_nullInput()
     {
         EmbeddingCacheService embeddingCacheService =
-                new EmbeddingCacheService( false, this.mockConnection, this.mockConsoleLogger );
+                new EmbeddingCacheService( false, this.mockDSLContext, this.mockConsoleLogger );
 
         IllegalArgumentException exception = assertThrowsExactly( IllegalArgumentException.class,
                 () -> embeddingCacheService.cacheEmbedding( null, this.testEmbeddingVector.vector() ));
@@ -129,7 +130,7 @@ class EmbeddingCacheServiceTest
     void testCacheEmbedding_emptyInput()
     {
         EmbeddingCacheService embeddingCacheService =
-                new EmbeddingCacheService( false, this.mockConnection, this.mockConsoleLogger );
+                new EmbeddingCacheService( false, this.mockDSLContext, this.mockConsoleLogger );
 
         IllegalArgumentException exception = assertThrowsExactly( IllegalArgumentException.class,
                 () -> embeddingCacheService.cacheEmbedding( "", this.testEmbeddingVector.vector() ));
@@ -141,7 +142,7 @@ class EmbeddingCacheServiceTest
     void testCacheEmbedding_nullVector()
     {
         EmbeddingCacheService embeddingCacheService =
-                new EmbeddingCacheService( false, this.mockConnection, this.mockConsoleLogger );
+                new EmbeddingCacheService( false, this.mockDSLContext, this.mockConsoleLogger );
 
         IllegalArgumentException exception = assertThrowsExactly( IllegalArgumentException.class,
                 () -> embeddingCacheService.cacheEmbedding( "Test", null ));
@@ -153,7 +154,7 @@ class EmbeddingCacheServiceTest
     void testCacheEmbedding_emptyVector()
     {
         EmbeddingCacheService embeddingCacheService =
-                new EmbeddingCacheService( false, this.mockConnection, this.mockConsoleLogger );
+                new EmbeddingCacheService( false, this.mockDSLContext, this.mockConsoleLogger );
 
         IllegalArgumentException exception = assertThrowsExactly( IllegalArgumentException.class,
                 () -> embeddingCacheService.cacheEmbedding( "Test", new ImmutableDoubleArray( new double[] {} )));
@@ -162,68 +163,77 @@ class EmbeddingCacheServiceTest
     }
 
     @Test
-    @SuppressWarnings( "MagicConstant" )
-    void testCacheEmbedding_duplicate() throws Exception
+    void testCacheEmbedding_duplicate()
     {
-        EmbeddingCacheService embeddingCacheService =
-                new EmbeddingCacheService( false, this.mockConnection, this.mockConsoleLogger );
+        String testInput = "Test";
 
-        when( this.mockConnection.prepareStatement( any(), anyInt() )).thenReturn( this.mockPreparedStatement );
-        when( this.mockPreparedStatement.executeUpdate() ).thenReturn( 0 );
+        this.mockCacheEmbedding( testInput );
+        when( this.mockReturningStep.execute() ).thenReturn( 0 );
+
+        EmbeddingCacheService embeddingCacheService =
+                new EmbeddingCacheService( false, this.mockDSLContext, this.mockConsoleLogger );
 
         IllegalArgumentException exception = assertThrowsExactly( IllegalArgumentException.class,
-                () -> embeddingCacheService.cacheEmbedding( "Test", this.testEmbeddingVector.vector() ));
+                () -> embeddingCacheService.cacheEmbedding( testInput, this.testEmbeddingVector.vector() ));
 
         assertEquals( "Input must not be a duplicate.", exception.getMessage() );
     }
 
     @Test
-    @SuppressWarnings( "MagicConstant" )
-    void testCacheEmbedding_success() throws Exception
+    void testCacheEmbedding_success()
     {
-        EmbeddingCacheService embeddingCacheService =
-                new EmbeddingCacheService( true, this.mockConnection, this.mockConsoleLogger );
+        String testInput = "Test";
+        long testId = 1_042;
 
-        when( this.mockConnection.prepareStatement( any(), anyInt() )).thenReturn( this.mockPreparedStatement );
-        when( this.mockPreparedStatement.executeUpdate() ).thenReturn( 1 );
-        when( this.mockPreparedStatement.getGeneratedKeys() ).thenReturn( this.mockResultSet );
-        when( this.mockResultSet.next() ).thenReturn( true );
-        when( this.mockResultSet.getLong( 1 )).thenReturn( 1_042L );
-        assertEquals( 1_042, embeddingCacheService.cacheEmbedding( "Test", this.testEmbeddingVector.vector() ));
+        this.mockCacheEmbedding( testInput );
+        when( this.mockReturningStep.execute() ).thenReturn( 1 );
+        when( this.mockDSLContext.lastID() ).thenReturn( BigInteger.valueOf( testId ));
+
+        EmbeddingCacheService embeddingCacheService =
+                new EmbeddingCacheService( true, this.mockDSLContext, this.mockConsoleLogger );
+
+        assertEquals( testId, embeddingCacheService.cacheEmbedding( testInput, this.testEmbeddingVector.vector() ));
 
         verify( this.mockConsoleLogger ).println( "Cache New Embedding, ID: 1,042" );
         verifyNoMoreInteractions( this.mockConsoleLogger );
     }
 
     @Test
-    void testGetInput_notFound() throws Exception
+    void testGetInput_notFound()
     {
-        EmbeddingCacheService embeddingCacheService =
-                new EmbeddingCacheService( false, this.mockConnection, this.mockConsoleLogger );
+        long testId = 1_234;
 
-        when( this.mockConnection.prepareStatement( any() )).thenReturn( this.mockPreparedStatement );
-        when( this.mockPreparedStatement.executeQuery() ).thenReturn( this.mockResultSet );
-        when( this.mockResultSet.next() ).thenReturn( false );
+        when( this.mockDSLContext.fetchValue( EMBEDDING.INPUT, EMBEDDING.ID.eq( testId ))).thenReturn( null );
+
+        EmbeddingCacheService embeddingCacheService =
+                new EmbeddingCacheService( false, this.mockDSLContext, this.mockConsoleLogger );
 
         RuntimeException exception = assertThrowsExactly( RuntimeException.class,
-                () -> embeddingCacheService.getInput( 1_234 ));
+                () -> embeddingCacheService.getInput( testId ));
 
         assertEquals( "Unable to find embedding with id: 1,234", exception.getMessage() );
     }
 
     @Test
-    void testGetInput_success() throws Exception
+    void testGetInput_success()
     {
-        EmbeddingCacheService embeddingCacheService =
-                new EmbeddingCacheService( false, this.mockConnection, this.mockConsoleLogger );
-
         String testInput = "Test Input";
+        long testId = 42;
 
-        when( this.mockConnection.prepareStatement( any() )).thenReturn( this.mockPreparedStatement );
-        when( this.mockPreparedStatement.executeQuery() ).thenReturn( this.mockResultSet );
-        when( this.mockResultSet.next() ).thenReturn( true );
-        when ( this.mockResultSet.getString( "Input" )).thenReturn( testInput );
+        when( this.mockDSLContext.fetchValue( EMBEDDING.INPUT, EMBEDDING.ID.eq( testId ))).thenReturn( testInput );
 
-        assertEquals( testInput, embeddingCacheService.getInput( 42 ));
+        EmbeddingCacheService embeddingCacheService =
+                new EmbeddingCacheService( false, this.mockDSLContext, this.mockConsoleLogger );
+
+        assertEquals( testInput, embeddingCacheService.getInput( testId ));
+    }
+
+    private void mockCacheEmbedding( String input )
+    {
+        when( this.mockDSLContext.insertInto( EMBEDDING, EMBEDDING.INPUT, EMBEDDING.VECTOR ))
+                .thenReturn( this.mockInsertValuesStep2 );
+        when( this.mockInsertValuesStep2.values( input, this.testEmbeddingVector.vector().toString() ))
+                .thenReturn( this.mockInsertValuesStep2 );
+        when( this.mockInsertValuesStep2.onDuplicateKeyIgnore() ).thenReturn( this.mockReturningStep );
     }
 }

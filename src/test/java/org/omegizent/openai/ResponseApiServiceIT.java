@@ -27,6 +27,7 @@ import org.omegizent.ingest.markdown.MarkdownLoader;
 import org.omegizent.qdrant.QdrantClientFactory;
 import org.omegizent.qdrant.QdrantService;
 
+import org.jooq.impl.DSL;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -90,7 +91,7 @@ class ResponseApiServiceIT
                       this.collectionName, collectionSize, false, this.taskRunner, this.qdrantClientFactory ))
         {
             OpenAiApiCaller openAiApiCaller = new OpenAiApiCaller();
-            EmbeddingCacheService embeddingCacheService = new EmbeddingCacheService( connection );
+            EmbeddingCacheService embeddingCacheService = new EmbeddingCacheService( DSL.using( connection ));
             EmbeddingApiService embeddingApiService = new EmbeddingApiService( openAiApiCaller );
             EmbeddingService embeddingService = new EmbeddingService( embeddingCacheService, embeddingApiService );
             ResponseApiService responseApiService =

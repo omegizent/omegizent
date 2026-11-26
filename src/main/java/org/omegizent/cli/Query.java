@@ -27,6 +27,8 @@ import org.omegizent.openai.OpenAiApiCaller;
 import org.omegizent.openai.ResponseApiService;
 import org.omegizent.qdrant.QdrantService;
 
+import org.jooq.impl.DSL;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -46,7 +48,7 @@ class Query
               QdrantService qdrantService = new QdrantService() )
         {
             OpenAiApiCaller openAiApiCaller = new OpenAiApiCaller();
-            EmbeddingCacheService embeddingCacheService = new EmbeddingCacheService( connection );
+            EmbeddingCacheService embeddingCacheService = new EmbeddingCacheService( DSL.using( connection ));
             EmbeddingApiService embeddingApiService = new EmbeddingApiService( openAiApiCaller );
             EmbeddingService embeddingService = new EmbeddingService( embeddingCacheService, embeddingApiService );
             ResponseApiService responseApiService =

@@ -27,6 +27,8 @@ import org.omegizent.openai.OpenAiApiCaller;
 import org.omegizent.qdrant.QdrantService;
 import org.omegizent.qdrant.SearchResult;
 
+import org.jooq.impl.DSL;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.LinkedList;
@@ -55,7 +57,7 @@ class Qdrant
               QdrantService qdrantService = new QdrantService() )
         {
             OpenAiApiCaller openAiApiCaller = new OpenAiApiCaller();
-            EmbeddingCacheService embeddingCacheService = new EmbeddingCacheService( connection );
+            EmbeddingCacheService embeddingCacheService = new EmbeddingCacheService( DSL.using( connection ));
             EmbeddingApiService embeddingApiService = new EmbeddingApiService( openAiApiCaller );
             EmbeddingService embeddingService = new EmbeddingService( embeddingCacheService, embeddingApiService );
 
