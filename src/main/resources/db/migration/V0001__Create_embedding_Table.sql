@@ -16,9 +16,12 @@ limitations under the License.
 
 */
 
-CREATE TABLE Embedding
+CREATE TABLE embedding
 (
-    Id      INTEGER  PRIMARY KEY,
-    Input   TEXT     NOT NULL  UNIQUE,
-    Vector  TEXT     NOT NULL
-)
+    id      INTEGER  PRIMARY KEY,
+    input   TEXT     NOT NULL,
+    vector  TEXT     NOT NULL
+);
+
+CREATE UNIQUE INDEX embedding_input_uix
+    ON embedding ( input );
