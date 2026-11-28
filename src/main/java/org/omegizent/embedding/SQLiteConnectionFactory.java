@@ -53,6 +53,7 @@ public class SQLiteConnectionFactory
         String databaseUrl = "jdbc:sqlite:" + databasePath;
         SQLiteDataSource dataSource = new SQLiteDataSource();
         dataSource.setUrl( databaseUrl );
+        dataSource.setEnforceForeignKeys( true );
 
         Flyway.configure().dataSource( dataSource ).load().migrate();
 
