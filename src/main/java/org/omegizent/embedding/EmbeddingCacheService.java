@@ -52,7 +52,10 @@ public class EmbeddingCacheService
         if ( input == null ) throw new IllegalArgumentException( "Input must not be null." );
         if ( input.isEmpty() ) throw new IllegalArgumentException( "Input must not be empty." );
 
-        EmbeddingRecord embeddingRecord = this.dslContext.fetchOne( EMBEDDING, EMBEDDING.INPUT.eq( input ));
+        EmbeddingRecord embeddingRecord = this.dslContext.fetchOne(
+                EMBEDDING,
+                EMBEDDING.EMBEDDING_MODEL_ID.eq( EmbeddingModel.TEXT_EMBEDDING_3_SMALL.getId() ),
+                EMBEDDING.INPUT.eq( input ));
         if ( embeddingRecord == null ) return null;
         return new EmbeddingVector( embeddingRecord.getId(), new ImmutableDoubleArray( embeddingRecord.getVector() ));
     }
@@ -66,8 +69,8 @@ public class EmbeddingCacheService
         if ( vector.length() == 0 ) throw new IllegalArgumentException( "Vector must not be empty." );
 
         int rowCount = this.dslContext
-                .insertInto( EMBEDDING, EMBEDDING.INPUT, EMBEDDING.VECTOR )
-                .values( input, vector.toString() )
+                .insertInto( EMBEDDING, EMBEDDING.EMBEDDING_MODEL_ID, EMBEDDING.INPUT, EMBEDDING.VECTOR )
+                .values( EmbeddingModel.TEXT_EMBEDDING_3_SMALL.getId(), input, vector.toString() )
                 .onDuplicateKeyIgnore()
                 .execute();
 

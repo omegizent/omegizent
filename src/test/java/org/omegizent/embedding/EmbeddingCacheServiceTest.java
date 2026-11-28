@@ -23,7 +23,7 @@ import org.omegizent.generated.jooq.tables.records.EmbeddingRecord;
 
 import org.jooq.DSLContext;
 import org.jooq.InsertReturningStep;
-import org.jooq.InsertValuesStep2;
+import org.jooq.InsertValuesStep3;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -45,10 +45,10 @@ class EmbeddingCacheServiceTest
     private final EmbeddingVector testEmbeddingVector =
             new EmbeddingVector( 42, new ImmutableDoubleArray( new double[] { -0.75, -0.5, 0.5, 0.75 } ));
 
-    @Mock private DSLContext                                           mockDSLContext;
-    @Mock private ConsoleLogger                                        mockConsoleLogger;
-    @Mock private InsertValuesStep2< EmbeddingRecord, String, String > mockInsertValuesStep2;
-    @Mock private InsertReturningStep< EmbeddingRecord >               mockReturningStep;
+    @Mock private DSLContext                                                 mockDSLContext;
+    @Mock private ConsoleLogger                                              mockConsoleLogger;
+    @Mock private InsertValuesStep3< EmbeddingRecord, Long, String, String > mockInsertValuesStep3;
+    @Mock private InsertReturningStep< EmbeddingRecord >                     mockReturningStep;
 
     @Test
     void testConstructor_nullDSLContext()
@@ -90,9 +90,15 @@ class EmbeddingCacheServiceTest
         String testInput = "Test";
 
         EmbeddingRecord testEmbeddingRecord = new EmbeddingRecord(
-                this.testEmbeddingVector.id(), testInput, this.testEmbeddingVector.vector().toString() );
+                this.testEmbeddingVector.id(),
+                EmbeddingModel.TEXT_EMBEDDING_3_SMALL.getId(),
+                testInput,
+                this.testEmbeddingVector.vector().toString() );
 
-        when( this.mockDSLContext.fetchOne( EMBEDDING, EMBEDDING.INPUT.eq( testInput )))
+        when( this.mockDSLContext.fetchOne(
+                        EMBEDDING,
+                        EMBEDDING.EMBEDDING_MODEL_ID.eq( EmbeddingModel.TEXT_EMBEDDING_3_SMALL.getId() ),
+                        EMBEDDING.INPUT.eq( testInput )))
                 .thenReturn( testEmbeddingRecord );
 
         EmbeddingCacheService embeddingCacheService =
@@ -106,7 +112,11 @@ class EmbeddingCacheServiceTest
     {
         String testInput = "Test";
 
-        when( this.mockDSLContext.fetchOne( EMBEDDING, EMBEDDING.INPUT.eq( testInput ))).thenReturn( null );
+        when( this.mockDSLContext.fetchOne(
+                        EMBEDDING,
+                        EMBEDDING.EMBEDDING_MODEL_ID.eq( EmbeddingModel.TEXT_EMBEDDING_3_SMALL.getId() ),
+                        EMBEDDING.INPUT.eq( testInput )))
+                .thenReturn( null );
 
         EmbeddingCacheService embeddingCacheService =
                 new EmbeddingCacheService( false, this.mockDSLContext, this.mockConsoleLogger );
@@ -230,10 +240,19 @@ class EmbeddingCacheServiceTest
 
     private void mockCacheEmbedding( String input )
     {
-        when( this.mockDSLContext.insertInto( EMBEDDING, EMBEDDING.INPUT, EMBEDDING.VECTOR ))
-                .thenReturn( this.mockInsertValuesStep2 );
-        when( this.mockInsertValuesStep2.values( input, this.testEmbeddingVector.vector().toString() ))
-                .thenReturn( this.mockInsertValuesStep2 );
-        when( this.mockInsertValuesStep2.onDuplicateKeyIgnore() ).thenReturn( this.mockReturningStep );
+        when( this.mockDSLContext.insertInto(
+                        EMBEDDING,
+                        EMBEDDING.EMBEDDING_MODEL_ID,
+                        EMBEDDING.INPUT,
+                        EMBEDDING.VECTOR ))
+                .thenReturn( this.mockInsertValuesStep3 );
+
+        when( this.mockInsertValuesStep3.values(
+                        EmbeddingModel.TEXT_EMBEDDING_3_SMALL.getId(),
+                        input,
+                        this.testEmbeddingVector.vector().toString() ))
+                .thenReturn( this.mockInsertValuesStep3 );
+
+        when( this.mockInsertValuesStep3.onDuplicateKeyIgnore() ).thenReturn( this.mockReturningStep );
     }
 }
